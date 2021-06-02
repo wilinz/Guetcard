@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
+/// 裁剪头像的页面
 class CropAvatarPage extends StatefulWidget {
   File avatarImage;
   CropAvatarPage(this.avatarImage, {Key key}) : super(key: key);

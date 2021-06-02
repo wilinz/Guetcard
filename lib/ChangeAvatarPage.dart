@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:crop_image/crop_image.dart';
 
+/// 在预设头像中选择一个头像的页面
 class ChangeAvatarPage extends StatelessWidget {
   final controller = CropController(
     aspectRatio: 1,

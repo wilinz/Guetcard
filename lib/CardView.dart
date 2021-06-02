@@ -87,6 +87,7 @@ class _AvatarImageState extends State<AvatarImage> {
   }
 }
 
+/// 头像组件，负责调用切换头像的页面及更换头像功能
 class AvatarView extends StatefulWidget {
   const AvatarView({Key key}) : super(key: key);
 
@@ -99,6 +100,7 @@ class _AvatarViewState extends State<AvatarView> {
   static const String _defaultAvatar = "images/default_avatar.jpg";
   static const _width = 90.0;
 
+  /// 从 SharedPreferences 加载用户自定义头像
   loadUserAvatar() async {
     if (kIsWeb) {
       var pref = await SharedPreferences.getInstance();
@@ -126,6 +128,7 @@ class _AvatarViewState extends State<AvatarView> {
     }
   }
 
+  /// 从磁盘中删除此前的旧头像
   deletePreviousAvatar(String lastAvatarPath) async {
     if (lastAvatarPath != null && !(lastAvatarPath.startsWith("http"))) {
       File lastAvatar = File(lastAvatarPath);
@@ -137,6 +140,7 @@ class _AvatarViewState extends State<AvatarView> {
     }
   }
 
+  /// 将用户自定义头像的路径（或url）保存到 SharedPreferences 中
   saveUserAvatar(String path) async {
     var pref = await SharedPreferences.getInstance();
     if (path != null) {
@@ -156,7 +160,7 @@ class _AvatarViewState extends State<AvatarView> {
   @override
   Widget build(BuildContext context) {
     if (kIsWeb) {
-      /// 网页版
+      // 网页版
       Image img = Image.network(
         _avatarPath,
         width: _width,
@@ -176,9 +180,10 @@ class _AvatarViewState extends State<AvatarView> {
         child: img,
       );
     } else {
-      /// 移动端
+      // 移动端
       Image img;
       if (_avatarPath.startsWith("image")) {
+        // 如果路径的开头是 image 则意味着是从 asset 中加载默认头像
         try {
           img = Image.asset(
             _avatarPath,
@@ -191,6 +196,7 @@ class _AvatarViewState extends State<AvatarView> {
           );
         }
       } else if (_avatarPath.startsWith("http")) {
+        // 如果路径开头是 http 则意味着是从网络上加载自定义头像
         try {
           img = Image.network(
             _avatarPath,
@@ -203,6 +209,7 @@ class _AvatarViewState extends State<AvatarView> {
           );
         }
       } else {
+        // 否则从应用程序 data 目录中加载自定义头像
         try {
           img = Image.file(
             File(_avatarPath),
@@ -454,6 +461,7 @@ class _TimerViewState extends State<TimerView> {
   }
 }
 
+/// 显示姓名的动态组件
 class NameView extends StatefulWidget {
   const NameView({Key key}) : super(key: key);
 
@@ -531,6 +539,7 @@ class _NameViewState extends State<NameView> {
   }
 }
 
+/// 显示”桂电畅行健康码“和”广西健康码“的假按钮
 class FakeTabButtonView extends StatelessWidget {
   const FakeTabButtonView({Key key}) : super(key: key);
 
@@ -577,6 +586,7 @@ class FakeTabButtonView extends StatelessWidget {
   }
 }
 
+/// 显示通行证的假按钮
 class PassportView extends StatelessWidget {
   const PassportView({Key key}) : super(key: key);
   @override
