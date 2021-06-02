@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+/// 在SimpleDialog上封装的一个简单的输入对话框
 class InputDialog extends StatelessWidget {
   final Widget title;
   final Function onOkBtnPressed;

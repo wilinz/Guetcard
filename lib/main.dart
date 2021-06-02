@@ -29,9 +29,8 @@ void main() {
   ));
 }
 
+/// app的根组件
 class MyApp extends StatelessWidget {
-  
-  // 自定义组件，继承于无状态组件类
   @override
   Widget build(BuildContext context) {
     double _titleOffset = 0.0;
@@ -43,7 +42,6 @@ class MyApp extends StatelessWidget {
     }
     //printPref();
 
-    // 需要实现 build 方法并返回一个组件
     return MaterialApp(
       title: '桂电畅行证',
       theme: ThemeData(
@@ -223,7 +221,7 @@ class _CheckPointViewState extends State<CheckPointView> {
   }
 }
 
-/// 选择检查点按钮的列表内项目
+/// 选择检查点按钮列表内项目
 class CheckPointDialogOption extends StatelessWidget {
   String name;
   CheckPointDialogOption({Key key, String name}) : super(key: key) {
