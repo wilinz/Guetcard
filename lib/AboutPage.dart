@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {
   const AboutPage({Key key}) : super(key: key);
   static const md = '''
