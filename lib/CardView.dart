@@ -99,6 +99,7 @@ class _AvatarViewState extends State<AvatarView> {
   String _avatarPath = "images/default_avatar.jpg";
   static const String _defaultAvatar = "images/default_avatar.jpg";
   static const _width = 90.0;
+  Image img;
 
   /// 从 SharedPreferences 加载用户自定义头像
   loadUserAvatar() async {
@@ -161,7 +162,7 @@ class _AvatarViewState extends State<AvatarView> {
   Widget build(BuildContext context) {
     if (kIsWeb) {
       // 网页版
-      Image img = Image.network(
+      img = Image.network(
         _avatarPath,
         width: _width,
       );
@@ -181,7 +182,7 @@ class _AvatarViewState extends State<AvatarView> {
       );
     } else {
       // 移动端
-      Image img;
+      img;
       if (_avatarPath.startsWith("image")) {
         // 如果路径的开头是 image 则意味着是从 asset 中加载默认头像
         try {

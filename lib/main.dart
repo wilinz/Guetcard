@@ -119,10 +119,6 @@ class HomeContent extends StatelessWidget {
     return Container(
       child: ListView(
         children: <Widget>[
-          /*Container(
-            height: 10,
-            decoration: BoxDecoration(color: Color.fromARGB(255, 9, 186, 7)),
-          ),*/
           CheckPointView(),
           Container(
             height: 34,

@@ -11,3 +11,12 @@
     两种方法：
     1. （推荐）将[此页面](https://guet-card.web.app)添加到主屏幕，作为一个网页应用使用
     2. 使用 AltStore 自签或越狱后安装 [release](https://gitee.com/guetcard/guetcard/releases) 页面中的 ipa 安装包。
+
+## 构建
+```
+flutter pub get
+flutter build apk  # 构建 Android 版本
+flutter build ios  # 构建 iOS 版本
+flutter build web  # 构建 web 版本
+```
+或者使用 `./build.sh` 构建脚本

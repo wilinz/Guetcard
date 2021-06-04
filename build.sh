@@ -56,23 +56,28 @@ if [ $# -gt 0 ]; then
             print_help
         elif [ "$arg"x = 'apk'x ]; then
             flutter clean
+            flutter pub get
             build_apk
             exit
         elif [ "$arg"x == 'ipa'x ]; then
             flutter clean
+            flutter pub get
             build_iOS
             iOS_archive
             exit
         elif [ "$arg"x == 'web'x ]; then
             flutter clean
+            flutter pub get
             build_web
             exit
         elif [ "$arg"x == 'all'x ]; then
             flutter clean
+            flutter pub get
             build_all
             exit
         elif [ "$arg"x == 'tmx'x ]; then
             flutter clean
+            flutter pub get
             tmux_build_all
             exit
         elif [ "$arg"x == 'archive'x ]; then
