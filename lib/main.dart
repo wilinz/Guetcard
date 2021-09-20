@@ -108,7 +108,6 @@ class _MyAppState extends State<MyApp> {
           ],
           elevation: 0,
           toolbarHeight: 50,
-          brightness: Brightness.dark,
         ),
         body: HomeContent(),
         bottomNavigationBar: BottomBar(),

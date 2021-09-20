@@ -358,20 +358,22 @@ class QrCodeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String time =
+        DateTime.now().toString().split(":").sublist(0, 2).join(":");
     return Column(
       children: [
         Stack(
           children: [
             qr.QrImage(
-              data: "三点几辣！饮茶先辣！做做len啊做！三点几饮，饮茶先辣！做咁多，钱带去边度？",
-              foregroundColor: Color.fromARGB(255, 0, 190, 0),
+              data: "三点几辣！饮茶先辣！做做len啊做！",
+              foregroundColor: Color.fromARGB(255, 0, 180, 0),
               size: QrCodeSize,
             ),
             Container(
               child: Container(
                 child: Text("可以通行",
                     style: TextStyle(
-                      color: Color.fromARGB(255, 0, 190, 0),
+                      color: Color.fromARGB(255, 0, 180, 0),
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                     )),
@@ -386,7 +388,7 @@ class QrCodeView extends StatelessWidget {
         ),
         Container(
           child: Text(
-            "更新时间：2021-09-20 10:14",
+            "更新时间：$time",
             style: TextStyle(color: Colors.grey, fontSize: 15),
           ),
           padding: EdgeInsets.only(bottom: 10),
@@ -397,7 +399,7 @@ class QrCodeView extends StatelessWidget {
               "我的行程卡",
               style: TextStyle(
                 fontSize: 15,
-                color: Color.fromARGB(255, 0, 190, 0),
+                color: Color.fromARGB(255, 0, 180, 0),
               ),
             ),
             Text(
@@ -408,7 +410,7 @@ class QrCodeView extends StatelessWidget {
               "疫苗接种记录",
               style: TextStyle(
                 fontSize: 15,
-                color: Color.fromARGB(255, 0, 204, 0),
+                color: Color.fromARGB(255, 0, 180, 0),
               ),
             ),
           ],
@@ -501,7 +503,7 @@ class _TimerViewState extends State<TimerView> {
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w600,
-            color: Color.fromARGB(255, 0, 179, 0),
+            color: Color.fromARGB(255, 0, 180, 0),
           ),
         ),
       ),
@@ -595,6 +597,10 @@ class _NameViewState extends State<NameView> {
             ),
             Divider(
               height: 30,
+              indent: 0,
+              endIndent: 0,
+              thickness: 0.5,
+              color: Colors.grey,
             ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20),
