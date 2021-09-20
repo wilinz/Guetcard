@@ -1,13 +1,12 @@
-import 'dart:ui';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:guet_card/CardView.dart';
 import 'package:guet_card/AboutPage.dart';
+import 'package:guet_card/CardView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void printPref() async {
   var pref = await SharedPreferences.getInstance();
@@ -30,7 +29,17 @@ void main() {
 }
 
 /// app的根组件
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     double _titleOffset = 0.0;
@@ -45,12 +54,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '桂电畅行证',
       theme: ThemeData(
-        primaryColor: Color.fromARGB(255, 9, 186, 7),
-        buttonColor: Colors.green,
+        primarySwatch: Colors.green,
         brightness: Brightness.light,
       ),
       home: Scaffold(
         appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 9, 186, 7),
           title: Transform(
             child: Text("桂电畅行证",
                 style: TextStyle(
@@ -76,24 +85,23 @@ class MyApp extends StatelessWidget {
             SizedBox(
                 height: _bubble_width,
                 child: Center(
-                  child: Builder(
-                    builder: (context) => OutlinedButton(
-                      // 右上角图标
-                      child: TopRightIconsImage(),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 7, 158, 6),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(15))),
-                        padding: EdgeInsets.all(5),
-                        minimumSize: Size(90, _bubble_width),
-                      ),
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(
-                            builder: (context) => AboutPage()));
-                      },
+                    child: Builder(
+                  builder: (context) => OutlinedButton(
+                    // 右上角图标
+                    child: TopRightIconsImage(),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 7, 158, 6),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15))),
+                      padding: EdgeInsets.all(5),
+                      minimumSize: Size(90, _bubble_width),
                     ),
-                  )
-                )),
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => AboutPage()));
+                    },
+                  ),
+                ))),
             SizedBox(
               width: 10,
             )
@@ -116,6 +124,7 @@ class HomeContent extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
+
     return Container(
       child: ListView(
         children: <Widget>[
@@ -124,7 +133,9 @@ class HomeContent extends StatelessWidget {
             height: 34,
             decoration: BoxDecoration(color: Color.fromARGB(255, 9, 186, 7)),
           ),
-          CardView(screenHeight: height, screenWidth: width,),
+          CardView(
+            screenWidth: width,
+          ),
         ],
         physics: BouncingScrollPhysics(),
       ),
@@ -137,6 +148,7 @@ class HomeContent extends StatelessWidget {
 class TopLeftIconImage extends StatelessWidget {
   const TopLeftIconImage({Key key}) : super(key: key);
   static const _height = 20.0;
+
   @override
   Widget build(BuildContext context) {
     if (kIsWeb == true) {
@@ -156,6 +168,7 @@ class TopLeftIconImage extends StatelessWidget {
 class TopRightIconsImage extends StatelessWidget {
   const TopRightIconsImage({Key key}) : super(key: key);
   static const _height = 20.0;
+
   @override
   Widget build(BuildContext context) {
     if (kIsWeb == true) {
@@ -181,6 +194,7 @@ class CheckPointView extends StatefulWidget {
 
 class _CheckPointViewState extends State<CheckPointView> {
   var _checkPointName = "花江检查点";
+
   onLabelPressed() async {
     var checkPointName = await showDialog(
             context: context,
@@ -197,6 +211,11 @@ class _CheckPointViewState extends State<CheckPointView> {
     setState(() {
       this._checkPointName = checkPointName;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -220,6 +239,7 @@ class _CheckPointViewState extends State<CheckPointView> {
 /// 选择检查点按钮列表内项目
 class CheckPointDialogOption extends StatelessWidget {
   String name;
+
   CheckPointDialogOption({Key key, String name}) : super(key: key) {
     this.name = name;
   }

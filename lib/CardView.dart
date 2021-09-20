@@ -1,25 +1,26 @@
 import 'dart:async';
-import 'dart:ui';
 import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:guet_card/CropAvatarPage.dart';
 import 'package:guet_card/ChangeAvatarPage.dart';
+import 'package:guet_card/CropAvatarPage.dart';
 import 'package:guet_card/InputDialog.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart' as qr;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image_picker/image_picker.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 /// 卡片视图，包括时间、头像、二维码等信息以及外面的灰色框框
 class CardView extends StatelessWidget {
-  final double cardHeight = 605;
-  final double screenHeight;
+  final double cardHeight = 850;
+  final double cardViewHeight = 820;
   final double screenWidth;
-  const CardView({Key key, this.screenHeight = 605, this.screenWidth})
-      : super(key: key);
+
+  const CardView({Key key, this.screenWidth}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +37,8 @@ class CardView extends StatelessWidget {
                   TimerView(),
                   AvatarView(),
                   NameView(),
-                  FakeTabButtonView(),
                   QrCodeView(),
-                  PassportView(),
+                  PassportView()
                 ],
               ),
               shape: RoundedRectangleBorder(
@@ -48,11 +48,11 @@ class CardView extends StatelessWidget {
             ),
             widthFactor: 0.93,
           ),
-          maxHeight: cardHeight + 33,
+          maxHeight: cardHeight,
           alignment: Alignment.bottomCenter,
         ),
       ),
-      height: screenHeight,
+      height: cardViewHeight,
       alignment: Alignment.topCenter,
       decoration: BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
     );
@@ -348,19 +348,79 @@ class _AvatarViewState extends State<AvatarView> {
 
 /// 二维码视图，最大尺寸为250
 class QrCodeView extends StatelessWidget {
+  static const double QrCodeSize = 250;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        qr.QrImage(
-          data: "三点几辣！饮茶先辣！做做len啊做！三点几饮，饮茶先辣！做咁多，钱带去边度？",
-          foregroundColor: Color.fromARGB(255, 0, 204, 0),
-          size: 250,
+        Stack(
+          children: [
+            qr.QrImage(
+              data: "三点几辣！饮茶先辣！做做len啊做！三点几饮，饮茶先辣！做咁多，钱带去边度？",
+              foregroundColor: Color.fromARGB(255, 0, 190, 0),
+              size: QrCodeSize,
+            ),
+            Container(
+              child: Container(
+                child: Text("可以通行",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 190, 0),
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                    )),
+                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                color: Colors.white,
+              ),
+              width: QrCodeSize,
+              height: QrCodeSize,
+              alignment: Alignment.center,
+            ),
+          ],
         ),
-        SizedBox(
-          width: 0,
-          height: 10,
+        Container(
+          child: Text(
+            "更新时间：2021-09-20 10:14",
+            style: TextStyle(color: Colors.grey, fontSize: 15),
+          ),
+          padding: EdgeInsets.only(bottom: 10),
         ),
+        Container(
+          child: Row(
+            children: [
+              Text(
+                "我的行程卡",
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Color.fromARGB(255, 0, 190, 0),
+                ),
+              ),
+              Text(
+                "      |    ",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+              ),
+              Text(
+                "疫苗接种记录",
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Color.fromARGB(255, 0, 204, 0),
+                ),
+              ),
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+          ),
+          padding: EdgeInsets.only(bottom: 30),
+        ),
+        Column(
+          children: [
+            Text("依托全国一体化政务服务平台"),
+            SizedBox(height: 5),
+            Text("实现跨省（区、市）数据共享和互通互认"),
+            SizedBox(height: 5),
+            Text("数据来源：国家政务服务平台（广西壮族自治区）")
+          ],
+        ),
+        Padding(padding: EdgeInsets.only(bottom: 10)),
         Container(
           child: Row(
             children: [
@@ -446,7 +506,7 @@ class _TimerViewState extends State<TimerView> {
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: Color.fromARGB(255, 0, 179, 0),
           ),
         ),
       ),
@@ -516,21 +576,58 @@ class _NameViewState extends State<NameView> {
         onPressed: () {
           inputName();
         },
-        child: Row(
+        child: Column(
           children: [
-            Text(
-              "**" + _lastWordOfName + " 可以通行",
-              maxLines: 1,
-              style: TextStyle(
-                color: Color(0xFF008000),
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),
+            Row(
+              children: [
+                Text(
+                  "**" + _lastWordOfName + " 可以通行",
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: Color(0xFF008000),
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
             ),
+            Divider(
+              height: 30,
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  Text(
+                    "**" + _lastWordOfName + "的广西健康码",
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Padding(padding: EdgeInsets.symmetric(vertical: 3)),
+                  Text(
+                    "姓名：**" +
+                        _lastWordOfName +
+                        "\n证件类型：身份证\n证件号码：450********2396",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 15,
+                      //fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+                ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            )
           ],
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
         ),
         style: TextButton.styleFrom(
           padding: EdgeInsets.zero,
@@ -540,52 +637,6 @@ class _NameViewState extends State<NameView> {
   }
 }
 
-/// 显示”桂电畅行健康码“和”广西健康码“的假按钮
-class FakeTabButtonView extends StatelessWidget {
-  const FakeTabButtonView({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        OutlinedButton(
-          child: Text(
-            "桂电畅行健康码",
-            style: TextStyle(color: Colors.white),
-          ),
-          style: TextButton.styleFrom(
-              backgroundColor: Color(0xFF07BA05),
-              minimumSize: Size(150, 30),
-              side: BorderSide(color: Color(0xFF07BA05)),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(3),
-                topRight: Radius.zero,
-                bottomLeft: Radius.circular(3),
-                bottomRight: Radius.zero,
-              ))),
-        ),
-        OutlinedButton(
-            child: Text(
-              "广西健康码",
-              style: TextStyle(color: Color(0xFF07BA05)),
-            ),
-            style: OutlinedButton.styleFrom(
-                backgroundColor: Colors.white,
-                minimumSize: Size(150, 30),
-                side: BorderSide(color: Color(0xFF07BA05)),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                  topLeft: Radius.zero,
-                  topRight: Radius.circular(3),
-                  bottomLeft: Radius.zero,
-                  bottomRight: Radius.circular(3),
-                )))),
-      ],
-      mainAxisAlignment: MainAxisAlignment.center,
-    );
-  }
-}
 
 /// 显示通行证的假按钮
 class PassportView extends StatelessWidget {
