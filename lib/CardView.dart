@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -16,8 +17,8 @@ final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 /// 卡片视图，包括时间、头像、二维码等信息以及外面的灰色框框
 class CardView extends StatelessWidget {
-  final double cardHeight = 850;
-  final double cardViewHeight = 820;
+  final double cardHeight = 880;
+  final double cardViewHeight = 840;
   final double screenWidth;
 
   const CardView({Key key, this.screenWidth}) : super(key: key);
@@ -37,7 +38,9 @@ class CardView extends StatelessWidget {
                   TimerView(),
                   AvatarView(),
                   NameView(),
+                  SizedBox(height: 20),
                   QrCodeView(),
+                  SizedBox(height: 20),
                   PassportView()
                 ],
               ),
@@ -62,6 +65,7 @@ class CardView extends StatelessWidget {
 /// 头像图像显示
 class AvatarImage extends StatefulWidget {
   String avatarPath;
+
   AvatarImage(this.avatarPath, {Key key}) : super(key: key);
 
   @override
@@ -71,7 +75,9 @@ class AvatarImage extends StatefulWidget {
 class _AvatarImageState extends State<AvatarImage> {
   String avatarPath;
   static const _width = 90.0;
+
   _AvatarImageState(this.avatarPath);
+
   @override
   Widget build(BuildContext context) {
     if (kIsWeb) {
@@ -385,84 +391,73 @@ class QrCodeView extends StatelessWidget {
           ),
           padding: EdgeInsets.only(bottom: 10),
         ),
-        Container(
-          child: Row(
-            children: [
-              Text(
-                "我的行程卡",
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Color.fromARGB(255, 0, 190, 0),
-                ),
-              ),
-              Text(
-                "      |    ",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-              ),
-              Text(
-                "疫苗接种记录",
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Color.fromARGB(255, 0, 204, 0),
-                ),
-              ),
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-          ),
-          padding: EdgeInsets.only(bottom: 30),
-        ),
-        Column(
+        Row(
           children: [
-            Text("依托全国一体化政务服务平台"),
-            SizedBox(height: 5),
-            Text("实现跨省（区、市）数据共享和互通互认"),
-            SizedBox(height: 5),
-            Text("数据来源：国家政务服务平台（广西壮族自治区）")
+            Text(
+              "我的行程卡",
+              style: TextStyle(
+                fontSize: 15,
+                color: Color.fromARGB(255, 0, 190, 0),
+              ),
+            ),
+            Text(
+              "      |    ",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+            ),
+            Text(
+              "疫苗接种记录",
+              style: TextStyle(
+                fontSize: 15,
+                color: Color.fromARGB(255, 0, 204, 0),
+              ),
+            ),
           ],
+          mainAxisAlignment: MainAxisAlignment.center,
         ),
-        Padding(padding: EdgeInsets.only(bottom: 10)),
-        Container(
-          child: Row(
-            children: [
-              Container(
-                width: 17,
-                height: 17,
-                color: Color(0xFF00CC00),
-              ),
-              SizedBox(width: 5, height: 0),
-              Text(
-                "可通行",
-                style: TextStyle(color: Colors.grey),
-              ),
-              SizedBox(width: 30, height: 0),
-              Container(
-                width: 17,
-                height: 17,
-                color: Color(0xFFFE9900),
-              ),
-              SizedBox(width: 5, height: 0),
-              Text(
-                "限制通行",
-                style: TextStyle(color: Colors.grey),
-              ),
-              SizedBox(width: 30, height: 0),
-              Container(
-                width: 17,
-                height: 17,
-                color: Color(0xFFFE0000),
-              ),
-              SizedBox(width: 5, height: 0),
-              Text(
-                "不可通行",
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-          ),
-          height: 45,
-          //color: Colors.black12,
+        SizedBox(height: 30),
+        Text(
+          "依托全国一体化政务服务平台\n实现跨省（区、市）数据共享和互通互认\n数据来源：国家政务服务平台（广西壮族自治区）",
+          textAlign: TextAlign.center,
         ),
+        SizedBox(height: 10),
+        Row(
+          children: [
+            Container(
+              width: 17,
+              height: 17,
+              color: Color(0xFF00CC00),
+            ),
+            SizedBox(width: 5, height: 0),
+            Text(
+              "可通行",
+              style: TextStyle(color: Colors.grey),
+            ),
+            SizedBox(width: 30, height: 0),
+            Container(
+              width: 17,
+              height: 17,
+              color: Color(0xFFFE9900),
+            ),
+            SizedBox(width: 5, height: 0),
+            Text(
+              "限制通行",
+              style: TextStyle(color: Colors.grey),
+            ),
+            SizedBox(width: 30, height: 0),
+            Container(
+              width: 17,
+              height: 17,
+              color: Color(0xFFFE0000),
+            ),
+            SizedBox(width: 5, height: 0),
+            Text(
+              "不可通行",
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+        )
       ],
     );
   }
@@ -572,6 +567,10 @@ class _NameViewState extends State<NameView> {
 
   @override
   Widget build(BuildContext context) {
+    final _random = Random();
+    int next(int min, int max) => min + _random.nextInt(max - min);
+    final int randNum1 = next(203, 582);
+    final int randNum2 = next(1365, 9658);
     return TextButton(
         onPressed: () {
           inputName();
@@ -581,7 +580,7 @@ class _NameViewState extends State<NameView> {
             Row(
               children: [
                 Text(
-                  "**" + _lastWordOfName + " 可以通行",
+                  "**$_lastWordOfName 可以通行",
                   maxLines: 1,
                   style: TextStyle(
                     color: Color(0xFF008000),
@@ -602,7 +601,7 @@ class _NameViewState extends State<NameView> {
               child: Column(
                 children: [
                   Text(
-                    "**" + _lastWordOfName + "的广西健康码",
+                    "**$_lastWordOfName的广西健康码",
                     maxLines: 1,
                     style: TextStyle(
                       color: Colors.black,
@@ -612,9 +611,7 @@ class _NameViewState extends State<NameView> {
                   ),
                   Padding(padding: EdgeInsets.symmetric(vertical: 3)),
                   Text(
-                    "姓名：**" +
-                        _lastWordOfName +
-                        "\n证件类型：身份证\n证件号码：450********2396",
+                    "姓名：**$_lastWordOfName\n证件类型：身份证\n证件号码：$randNum1********$randNum2",
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 15,
@@ -641,6 +638,7 @@ class _NameViewState extends State<NameView> {
 /// 显示通行证的假按钮
 class PassportView extends StatelessWidget {
   const PassportView({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Stack(
