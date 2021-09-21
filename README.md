@@ -12,6 +12,9 @@
 2. 如果你是 iPhone 用户：
     两种方法：
     1. （推荐）将[此页面](https://guet-card.web.app)添加到主屏幕，作为一个网页应用使用
+
+    ![](https://i.loli.net/2021/09/22/1m5Aj7txbpklY9E.jpg)
+
     2. 使用 AltStore 自签或越狱后安装 [release](https://gitee.com/guetcard/guetcard/releases) 页面中的 ipa 安装包。
 
 ## 构建
