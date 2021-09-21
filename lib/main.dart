@@ -1,18 +1,16 @@
 import 'dart:io';
 import 'dart:ui';
-import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_xupdate/flutter_xupdate.dart';
-import 'package:dio/dio.dart';
-import 'package:package_info/package_info.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:guet_card/AboutPage.dart';
 import 'package:guet_card/CardView.dart';
+import 'package:package_info/package_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void printPref() async {
   var pref = await SharedPreferences.getInstance();
@@ -382,13 +380,6 @@ Future<void> showIOSDialog(
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          // Container(
-          //     padding: const EdgeInsets.fromLTRB(40.0, 0, 40.0, 0),
-          //     child: Image(
-          //       width: MediaQuery.of(context).size.width,
-          //       image: AssetImage("images/bg_update_top.png"),
-          //       fit: BoxFit.fill,
-          //     )),
           Container(
               width: MediaQuery.of(context).size.width,
               margin: const EdgeInsets.fromLTRB(40.0, 0, 40.0, 0),
@@ -416,6 +407,7 @@ Future<void> showIOSDialog(
                       Text(updateInfo["description"],
                           style: TextStyle(
                               fontSize: 14.0,
+                              fontWeight: FontWeight.w400,
                               color: Colors.grey,
                               decoration: TextDecoration.none)),
                       Container(
@@ -439,10 +431,11 @@ Future<void> showIOSDialog(
                                     color: Color(0xffffbb5b), fontSize: 18.0),
                               ),
                               onPressed: () async {
+                                Navigator.of(context).pop(); //关闭对话框
                                 await canLaunch(updateInfo["ipaUrl"])
                                     ? await launch(updateInfo["ipaUrl"])
                                     : throw 'Could not launch ${updateInfo["ipaUrl"]}';
-                              }, //关闭对话框
+                              },
                             ),
                           ],
                         ),
