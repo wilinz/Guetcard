@@ -7,9 +7,11 @@ import 'package:url_launcher/url_launcher.dart';
 class AboutPage extends StatelessWidget {
   const AboutPage({Key key}) : super(key: key);
   static const md = '''
-# guet_card v1.2.1
+# guet_card v1.3.0
 一个使用 Flutter 重写的 guet_card，支持 Android、iOS、网页端。
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
+
+![tutorial.png](https://i.loli.net/2021/09/21/IBPdayAor3LO7l1.png)
 
 gitee 主页为：[gitee](https://gitee.com/guetcard/guetcard)
 

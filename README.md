@@ -3,6 +3,8 @@
 一个使用 Flutter 重写的 guet_card，支持 Android、iOS、网页端。
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
 
+![tutorial.png](https://i.loli.net/2021/09/21/IBPdayAor3LO7l1.png)
+
 ## 安装和使用
 1. 如果你是安卓用户：
     在 [release](https://gitee.com/guetcard/guetcard/releases) 页面中下载 apk 安装包安装

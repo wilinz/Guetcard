@@ -1,12 +1,18 @@
 import 'dart:io';
 import 'dart:ui';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_xupdate/flutter_xupdate.dart';
+import 'package:dio/dio.dart';
+import 'package:package_info/package_info.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:guet_card/AboutPage.dart';
 import 'package:guet_card/CardView.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void printPref() async {
   var pref = await SharedPreferences.getInstance();
@@ -17,6 +23,12 @@ void printPref() async {
   } catch (e) {
     print(e);
   }
+}
+
+Future<String> initPackageInfo() async {
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  String version = packageInfo.version;
+  return version;
 }
 
 void main() {
@@ -30,6 +42,10 @@ void main() {
 
 /// app的根组件
 class MyApp extends StatefulWidget {
+  static final navKey = new GlobalKey<NavigatorState>();
+
+  const MyApp({Key navKey}) : super(key: navKey);
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -38,6 +54,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    if (!kIsWeb) {
+      this.checkForUpdate();
+    }
   }
 
   @override
@@ -52,6 +71,7 @@ class _MyAppState extends State<MyApp> {
     //printPref();
 
     return MaterialApp(
+      navigatorKey: MyApp.navKey,
       title: '桂电畅行证',
       theme: ThemeData(
         primarySwatch: Colors.green,
@@ -86,22 +106,22 @@ class _MyAppState extends State<MyApp> {
                 height: _bubble_width,
                 child: Center(
                     child: Builder(
-                  builder: (context) => OutlinedButton(
-                    // 右上角图标
-                    child: TopRightIconsImage(),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 7, 158, 6),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
-                      padding: EdgeInsets.all(5),
-                      minimumSize: Size(90, _bubble_width),
-                    ),
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => AboutPage()));
-                    },
-                  ),
-                ))),
+                      builder: (context) => OutlinedButton(
+                        // 右上角图标
+                        child: TopRightIconsImage(),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 7, 158, 6),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(15))),
+                          padding: EdgeInsets.all(5),
+                          minimumSize: Size(90, _bubble_width),
+                        ),
+                        onPressed: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => AboutPage()));
+                        },
+                      ),
+                    ))),
             SizedBox(
               width: 10,
             )
@@ -113,6 +133,56 @@ class _MyAppState extends State<MyApp> {
         bottomNavigationBar: BottomBar(),
       ),
     );
+  }
+
+  void checkForUpdate() async {
+    String currentVersion = await initPackageInfo();
+    var response;
+    try {
+      response = await Dio().get(
+          "https://gitee.com/api/v5/repos/guetcard/guetcard/releases/latest");
+    } catch (e) {
+      print(e);
+    }
+    if (response.statusCode == 200) {
+      Map<String, dynamic> map = response.data;
+      String remoteVersion =
+          map["tag_name"].replaceAll("v", "").replaceAll(".", "");
+      if (int.parse(remoteVersion) >
+          int.parse(currentVersion.replaceAll(".", ""))) {
+        debugPrint("updating");
+        String apkUrl;
+        for (var item in map["assets"]) {
+          if (item["name"] != null && item["name"].endsWith(".apk")) {
+            apkUrl = item["browser_download_url"];
+          }
+        }
+
+        if (Platform.isAndroid) {
+          await FlutterXUpdate.init(
+            debug: true,
+            isWifiOnly: false,
+          );
+          UpdateEntity updateEntity = UpdateEntity(
+              hasUpdate: true,
+              versionCode: int.parse(remoteVersion),
+              versionName: map["tag_name"],
+              updateContent: map["body"],
+              downloadUrl: apkUrl);
+          FlutterXUpdate.updateByInfo(updateEntity: updateEntity);
+        } else if (Platform.isIOS) {
+          Map<String, dynamic> updateInfo = {
+            "ipaUrl": null,
+            "versionName": null,
+            "description": null,
+          };
+          updateInfo['ipaUrl'] = "https://gitee.com/guetcard/guetcard/releases";
+          updateInfo['versionName'] = map["tag_name"];
+          updateInfo['description'] = map["body"];
+          showIOSDialog(MyApp.navKey.currentState.overlay.context, updateInfo);
+        }
+      }
+    }
   }
 }
 
@@ -213,11 +283,6 @@ class _CheckPointViewState extends State<CheckPointView> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       child: TextButton(
@@ -305,4 +370,87 @@ class BottomBar extends StatelessWidget {
       height: 60,
     );
   }
+}
+
+// 跳转 AppStore 更新 iOSUrl APP 在 AppStore 的链接
+Future<void> showIOSDialog(
+    BuildContext context, Map<String, dynamic> updateInfo) async {
+  showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          // Container(
+          //     padding: const EdgeInsets.fromLTRB(40.0, 0, 40.0, 0),
+          //     child: Image(
+          //       width: MediaQuery.of(context).size.width,
+          //       image: AssetImage("images/bg_update_top.png"),
+          //       fit: BoxFit.fill,
+          //     )),
+          Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.fromLTRB(40.0, 0, 40.0, 0),
+              decoration: new BoxDecoration(
+                color: Color(0xffffffff),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              child: Container(
+                  padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0, top: 10.0),
+                        child: Text(
+                          '是否升级到${updateInfo["versionName"]}版本',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Color(0xff555555),
+                            decoration: TextDecoration.none,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      Text(updateInfo["description"],
+                          style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.grey,
+                              decoration: TextDecoration.none)),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 6.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            TextButton(
+                              child: Text(
+                                "下次再说",
+                                style: TextStyle(
+                                    color: Color(0xffffbb5b), fontSize: 18.0),
+                              ),
+                              onPressed: () =>
+                                  Navigator.of(context).pop(), //关闭对话框
+                            ),
+                            TextButton(
+                              child: Text(
+                                "立即前往",
+                                style: TextStyle(
+                                    color: Color(0xffffbb5b), fontSize: 18.0),
+                              ),
+                              onPressed: () async {
+                                await canLaunch(updateInfo["ipaUrl"])
+                                    ? await launch(updateInfo["ipaUrl"])
+                                    : throw 'Could not launch ${updateInfo["ipaUrl"]}';
+                              }, //关闭对话框
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ))),
+        ],
+      );
+    },
+  );
 }
