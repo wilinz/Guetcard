@@ -25,6 +25,11 @@
 
   <title>guet_card</title>
   <link rel="manifest" href="manifest.json">
+  <script>
+    if (platform.name.toLowerCase() == "safari" && parseInt(platform.version.split(".")[0]) >= 15) {
+        window.flutterWebRenderer = "html";
+    }
+  </script>
 </head>
 <body>
   <!-- This script installs service_worker.js to provide PWA functionality to

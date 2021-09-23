@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:guet_card/ChangeAvatarPage.dart';
 import 'package:guet_card/CropAvatarPage.dart';
 import 'package:guet_card/InputDialog.dart';
+import 'package:guet_card/main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart' as qr;
@@ -21,7 +22,7 @@ class CardView extends StatelessWidget {
   final double cardViewHeight = 840;
   final double screenWidth;
 
-  const CardView({Key key, this.screenWidth}) : super(key: key);
+  const CardView({Key? key, required this.screenWidth}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +37,8 @@ class CardView extends StatelessWidget {
                 children: [
                   Padding(padding: EdgeInsets.all(2)),
                   TimerView(),
-                  AvatarView(),
-                  NameView(),
+                  AvatarView(key: intro?.keys[1],),
+                  NameView(key: intro?.keys[2],),
                   SizedBox(height: 20),
                   QrCodeView(),
                   SizedBox(height: 20),
@@ -66,7 +67,7 @@ class CardView extends StatelessWidget {
 class AvatarImage extends StatefulWidget {
   String avatarPath;
 
-  AvatarImage(this.avatarPath, {Key key}) : super(key: key);
+  AvatarImage(this.avatarPath, {Key? key}) : super(key: key);
 
   @override
   _AvatarImageState createState() => _AvatarImageState(avatarPath);
@@ -95,7 +96,7 @@ class _AvatarImageState extends State<AvatarImage> {
 
 /// 头像组件，负责调用切换头像的页面及更换头像功能
 class AvatarView extends StatefulWidget {
-  const AvatarView({Key key}) : super(key: key);
+  const AvatarView({Key? key}) : super(key: key);
 
   @override
   _AvatarViewState createState() => _AvatarViewState();
@@ -105,7 +106,7 @@ class _AvatarViewState extends State<AvatarView> {
   String _avatarPath = "images/default_avatar.jpg";
   static const String _defaultAvatar = "images/default_avatar.jpg";
   static const _width = 90.0;
-  Image img;
+  late Image img;
 
   /// 从 SharedPreferences 加载用户自定义头像
   loadUserAvatar() async {
@@ -164,6 +165,8 @@ class _AvatarViewState extends State<AvatarView> {
     loadUserAvatar();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     if (kIsWeb) {
@@ -188,7 +191,7 @@ class _AvatarViewState extends State<AvatarView> {
       );
     } else {
       // 移动端
-      img;
+      late Image img;
       if (_avatarPath.startsWith("image")) {
         // 如果路径的开头是 image 则意味着是从 asset 中加载默认头像
         try {
@@ -467,7 +470,7 @@ class QrCodeView extends StatelessWidget {
 
 /// 显示时间（精确到毫秒）的动态组件，间隔130ms刷新一次来模拟原版小程序中的卡顿感
 class TimerView extends StatefulWidget {
-  const TimerView({Key key}) : super(key: key);
+  const TimerView({Key? key}) : super(key: key);
 
   @override
   _TimerViewState createState() => _TimerViewState();
@@ -475,7 +478,7 @@ class TimerView extends StatefulWidget {
 
 class _TimerViewState extends State<TimerView> {
   String _time = '00:00:00:00';
-  Timer _countdownTimer;
+  late Timer _countdownTimer;
   static const int _duration = 130;
 
   @override
@@ -513,15 +516,14 @@ class _TimerViewState extends State<TimerView> {
 
   @override
   void dispose() {
-    _countdownTimer?.cancel();
-    _countdownTimer = null;
+    _countdownTimer.cancel();
     super.dispose();
   }
 }
 
 /// 显示姓名的动态组件
 class NameView extends StatefulWidget {
-  const NameView({Key key}) : super(key: key);
+  const NameView({Key? key}) : super(key: key);
 
   @override
   _NameViewState createState() => _NameViewState();
@@ -574,76 +576,77 @@ class _NameViewState extends State<NameView> {
     final int randNum1 = next(203, 582);
     final int randNum2 = next(1365, 9658);
     return TextButton(
-        onPressed: () {
-          inputName();
-        },
-        child: Column(
-          children: [
-            Row(
+      onPressed: () {
+        inputName();
+      },
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                "**$_lastWordOfName 可以通行",
+                maxLines: 1,
+                style: TextStyle(
+                  color: Color(0xFF008000),
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+          ),
+          Divider(
+            height: 30,
+            indent: 0,
+            endIndent: 0,
+            thickness: 0.5,
+            color: Colors.grey,
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
               children: [
                 Text(
-                  "**$_lastWordOfName 可以通行",
+                  "**$_lastWordOfName的广西健康码",
                   maxLines: 1,
                   style: TextStyle(
-                    color: Color(0xFF008000),
-                    fontSize: 22,
+                    color: Colors.black,
+                    fontSize: 17,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                Padding(padding: EdgeInsets.symmetric(vertical: 3)),
+                Text(
+                  "姓名：**$_lastWordOfName\n证件类型：身份证\n证件号码：$randNum1********$randNum2",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 15,
+                    //fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Padding(padding: EdgeInsets.symmetric(vertical: 5)),
               ],
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
             ),
-            Divider(
-              height: 30,
-              indent: 0,
-              endIndent: 0,
-              thickness: 0.5,
-              color: Colors.grey,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  Text(
-                    "**$_lastWordOfName的广西健康码",
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.symmetric(vertical: 3)),
-                  Text(
-                    "姓名：**$_lastWordOfName\n证件类型：身份证\n证件号码：$randNum1********$randNum2",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 15,
-                      //fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.symmetric(vertical: 5)),
-                ],
-                crossAxisAlignment: CrossAxisAlignment.start,
-              ),
-            )
-          ],
-          crossAxisAlignment: CrossAxisAlignment.start,
-        ),
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-          minimumSize: Size(200, 40),
-          alignment: Alignment.topCenter,
-        ));
+          )
+        ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+      ),
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.zero,
+        minimumSize: Size(200, 40),
+        alignment: Alignment.topCenter,
+      )
+    );
   }
 }
 
 
 /// 显示通行证的假按钮
 class PassportView extends StatelessWidget {
-  const PassportView({Key key}) : super(key: key);
+  const PassportView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

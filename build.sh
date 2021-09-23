@@ -4,12 +4,12 @@ set -e
 WD=$(pwd)
 
 build_web() {
-    flutter build web
+    flutter build web --release --web-renderer html
     cp ./avatar_list.txt build/web/
 }
 
 deploy_web() {
-    flutter build web
+    flutter build web --release --web-renderer html
     cp ./avatar_list.txt build/web/
     firebase deploy
 }

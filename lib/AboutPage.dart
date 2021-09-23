@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {
-  const AboutPage({Key key}) : super(key: key);
+  const AboutPage({Key? key}) : super(key: key);
   static const md = '''
 # guet_card v1.3.1
 一个使用 Flutter 重写的 guet_card，支持 Android、iOS、网页端。
@@ -47,8 +47,14 @@ gitee 主页为：[gitee](https://gitee.com/guetcard/guetcard)
       body: Markdown(
         data: md,
         selectable: true,
-        onTapLink: (String text, String href, String title) async {
-          await canLaunch(href)? await launch(href) : throw "url_launch 无法打开 $href";
+        onTapLink: (String text, String? href, String title) async {
+          if (href != null) {
+            await canLaunch(href)
+                ? await launch(href)
+                : throw "url_launch 无法打开 $href";
+          } else {
+            throw "点击的链接 (text: $text, title: $title) 中不包含 URL";
+          }
         },
       ),
     );

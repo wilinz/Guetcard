@@ -7,19 +7,22 @@ import 'package:crop_image/crop_image.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:bmprogresshud/bmprogresshud.dart';
+import 'package:guet_card/main.dart';
 
 /// 裁剪头像的页面
 class CropAvatarPage extends StatefulWidget {
   File avatarImage;
-  CropAvatarPage(this.avatarImage, {Key key}) : super(key: key);
+  CropAvatarPage(this.avatarImage, {Key? key}) : super(key: key);
   _CropAvatarPageState createState() => new _CropAvatarPageState(avatarImage);
 }
 
 class _CropAvatarPageState extends State<CropAvatarPage> {
   File avatarImage;
-  bool _isSaving = false;
   _CropAvatarPageState(this.avatarImage);
+
+  // 是否可返回上一级页面
+  bool isPopable = true;
 
   final controller = CropController(
     aspectRatio: 1,
@@ -29,14 +32,12 @@ class _CropAvatarPageState extends State<CropAvatarPage> {
   Widget build(BuildContext context) {
     assert(avatarImage != null);
     debugPrint(avatarImage.path);
-    return Scaffold(
-      appBar: AppBar(
-        brightness: Brightness.dark,
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
-      body: ModalProgressHUD(
-          inAsyncCall: _isSaving,
-        child: Container(
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+        body: Container(
           padding: EdgeInsets.all(20),
           child: Center(
             child: CropImage(
@@ -45,42 +46,53 @@ class _CropAvatarPageState extends State<CropAvatarPage> {
             ),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.check,
-          color: Colors.white,
-        ),
-        onPressed: () async {
-          if (!_isSaving) {
+        floatingActionButton: FloatingActionButton(
+          child: Icon(
+            Icons.check,
+            color: Colors.white,
+          ),
+          onPressed: () async {
             try {
+              ProgressHud.show(ProgressHudType.loading, "保存中……");
               setState(() {
-                _isSaving = true;
+                isPopable = false;
               });
               ui.Image image =
-                  await controller.croppedBitmap(quality: FilterQuality.low);
+              await controller.croppedBitmap(quality: FilterQuality.low);
               var dir = await getApplicationDocumentsDirectory();
               var name = "${Uuid().v4()}.png";
               var path = '${dir.path}/$name';
               debugPrint("Avatar output path: ${path}");
               File savedImage = File(path);
-              ByteData imageData =
-                  await image.toByteData(format: ui.ImageByteFormat.png);
+              ByteData? imageData =
+              await image.toByteData(format: ui.ImageByteFormat.png);
+              if (imageData == null) {
+                throw "imageData should not be null!";
+              }
               Uint8List pngBytes = imageData.buffer.asUint8List();
               savedImage.writeAsBytesSync(pngBytes);
               Navigator.of(context).pop(name);
             } catch (e) {
+              ProgressHud.dismiss();
+              ProgressHud.showAndDismiss(ProgressHudType.error, "保存失败！");
+              setState(() {
+                isPopable = true;
+              });
               print(e);
             } finally {
+              ProgressHud.of(context).dismiss();
               setState(() {
-                _isSaving = false;
+                isPopable = true;
               });
             }
-          }
-        },
-        backgroundColor: Colors.green,
+          },
+          backgroundColor: Colors.green,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      onWillPop: () async {
+        return isPopable;
+      }
     );
   }
 }
