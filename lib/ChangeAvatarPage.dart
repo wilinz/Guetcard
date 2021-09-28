@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:crop_image/crop_image.dart';
 import 'package:dio/dio.dart';
-import 'package:guet_card/main.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 /// 在预设头像中选择一个头像的页面
 class ChangeAvatarPage extends StatelessWidget {
@@ -16,11 +15,13 @@ class ChangeAvatarPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        brightness: Brightness.dark,
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
           "选择一个头像",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: "PingFangSC",
+          ),
         ),
         leading: IconButton(
           icon: Icon(
@@ -49,7 +50,7 @@ class LazyImgList extends StatefulWidget {
 class _LazyImgListState extends State<LazyImgList> {
   List<String>? imgList;
   static const String avatarListUrl =
-      "https://guest-card-testing.web.app/avatar_list.txt";
+      "https://guet-card.web.app/avatar_list.txt";
 
   _LazyImgListState();
 
@@ -57,6 +58,7 @@ class _LazyImgListState extends State<LazyImgList> {
   void initState() {
     super.initState();
     Dio().get(avatarListUrl).then((value) {
+      print(value);
       var list = value.toString().split('\n');
       var _tmp = <String>[];
       for (String line in list) {
@@ -69,6 +71,12 @@ class _LazyImgListState extends State<LazyImgList> {
       debugPrint("头像列表下载失败:");
       debugPrint("error: $error");
       debugPrint("stack trace: $stackTrace");
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('网络好像不太好？我获取不到头像列表🤔'),
+        ),
+      );
     });
   }
 
@@ -121,7 +129,14 @@ class _LazyImgListState extends State<LazyImgList> {
           },
           itemCount: imgList!.length ~/ imgPerRow + 1);
     } else {
-      return Center(child: Text("正在获取头像列表……"));
+      return Center(
+        child: Text(
+          "正在获取头像列表……",
+          style: TextStyle(
+            fontFamily: "PingFangSC",
+          ),
+        ),
+      );
     }
   }
 }

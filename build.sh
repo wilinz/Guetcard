@@ -4,12 +4,12 @@ set -e
 WD=$(pwd)
 
 build_web() {
-    flutter build web --release --web-renderer html
+    flutter build web --release
     cp ./avatar_list.txt build/web/
 }
 
 deploy_web() {
-    flutter build web --release --web-renderer html
+    flutter build web --release
     cp ./avatar_list.txt build/web/
     firebase deploy
 }
@@ -24,22 +24,25 @@ build_iOS() {
 
 iOS_archive() {
     cd build/ios/iphoneos/
+    [ -d Payload ] && rm -rf Payload/
     mkdir Payload
     cp -r Runner.app Payload/
+    [ -f Payload.zip ] && rm Payload.zip
     zip Payload.zip -r Payload > /dev/null
     mv Payload.zip Payload.ipa
     rm -rf Payload/
-    cd $WD
+    cd "$WD"
 }
 
 tmux_build_all() {
     tmux new-session -s "flutter_build" -d
-    tmux send -t "flutter_build" "flutter build web --release && cp ./avatar_list.txt build/web/ && firebase deploy && exit" Enter
+    tmux send -t "flutter_build" "./build.sh web && exit" Enter
     tmux split-window -h
-    tmux send -t "flutter_build" "flutter build apk && exit" Enter
+    tmux send -t "flutter_build" "./build.sh apk && exit" Enter
     tmux split-window -v
-    tmux send -t "flutter_build" "flutter build ios && ./build.sh archive && exit" Enter
+    tmux send -t "flutter_build" "./build.sh ipa && exit" Enter
     tmux -2 attach-session -d
+    echo "Please run firebase deploy if you want to."
 }
 
 build_all() {
@@ -49,14 +52,15 @@ build_all() {
 }
 
 print_help() {
-    printf "Usage: $0 [-h] [apk] [ipa] [web] [all] [tmx] [deploy]
-    -h : show this help page
-    apk: build Android installation package
-    ipa: build iOS installation package
-    web: build website content
-    all: build all
-    tmx: build all with tmux splited screen
-    deploy: build website content and deploy to firebase\n"
+    printf "Usage: %s [-h] [apk] [ipa] [web] [all] [tmx] [deploy]
+    -h : show this help page.
+    apk: build Android installation package.
+    ipa: build iOS installation package.
+    web: build website content.
+    all: build all.
+    tmx: build all with tmux splited screen.
+    deploy: build website content and deploy to firebase.
+    archive: make archive for iOS payload that already been built.\n" "$0"
 }
 
 if [ $# -gt 0 ]; then
@@ -64,34 +68,22 @@ if [ $# -gt 0 ]; then
         if [ "$arg"x = "-h"x ]; then
             print_help
         elif [ "$arg"x = "apk"x ]; then
-            flutter clean
-            flutter pub get
             build_apk
             exit
         elif [ "$arg"x == "ipa"x ]; then
-            flutter clean
-            flutter pub get
             build_iOS
             iOS_archive
             exit
         elif [ "$arg"x == "web"x ]; then
-            flutter clean
-            flutter pub get
             build_web
             exit
         elif [ "$arg"x == "all"x ]; then
-            flutter clean
-            flutter pub get
             build_all
             exit
         elif [ "$arg"x == "tmx"x ]; then
-            flutter clean
-            flutter pub get
             tmux_build_all
             exit
         elif [ "$arg"x == "deploy"x ]; then
-            flutter clean
-            flutter pub get
             deploy_web
             exit
         elif [ "$arg"x == "archive"x ]; then
