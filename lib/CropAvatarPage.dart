@@ -81,11 +81,12 @@ class _CropAvatarPageState extends State<CropAvatarPage> {
               });
               print(e);
             } finally {
-              ProgressHud.of(context).dismiss();
-              setState(() {
-                isPopable = true;
-              });
-            }
+              ProgressHud.dismiss();
+                setState(() {
+                  isPopable = true;
+                });
+                ProgressHud.showSuccessAndDismiss(text: "保存成功！");
+              }
           },
           backgroundColor: Colors.green,
         ),

@@ -274,11 +274,7 @@ class _HomeContentState extends State<HomeContent> {
         }
       }
     }).onError((error, stackTrace) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('学校网又炸了？我检查不到更新🤔️'),
-        ),
-      );
+      ProgressHud.showErrorAndDismiss(text: "获取更新失败");
     });
   }
 
@@ -313,7 +309,8 @@ class _HomeContentState extends State<HomeContent> {
             decoration: BoxDecoration(color: Color.fromARGB(255, 9, 186, 7)),
           ),
           Container(
-            height: CardView.cardHeight + 35,
+            // 1180/1064 是二维码图片的长宽比
+            height: 1180 / 1064 * size.width + 670,
             decoration:
                 BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
             child: CardView(
@@ -336,12 +333,6 @@ class TopLeftIconImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // if (kIsWeb == true) {
-    //   return Image.network(
-    //     "https://i.loli.net/2021/05/30/8O9fP1GUZhb564l.png",
-    //     height: _height,
-    //   );
-    // }
     return Image.asset(
       "assets/images/TopLeftIcon.png",
       width: _height,
@@ -356,12 +347,6 @@ class TopRightIconsImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // if (kIsWeb == true) {
-    //   return Image.network(
-    //     "https://i.loli.net/2021/05/30/mr6O9tUyzq4Iu8x.png",
-    //     height: _height,
-    //   );
-    // }
     return Image.asset(
       "assets/images/TopRightIcon.png",
       height: _height,

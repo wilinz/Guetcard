@@ -30,9 +30,9 @@ class CardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (BuildContext context, Orientation orientation) {
-        CardView.cardWidth = this.screenWidth * 0.94;
-        CardView.cardHeight = 1180 / 1064 * cardWidth + 650;
-        CardView.cardViewHeight = CardView.cardHeight - 30;
+        // CardView.cardWidth = this.screenWidth * 0.94;
+        // CardView.cardHeight = 1180 / 1064 * cardWidth + 650;
+        // CardView.cardViewHeight = CardView.cardHeight - 30;
         return Container(
           child: Container(
             decoration:

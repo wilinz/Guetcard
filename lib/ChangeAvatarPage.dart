@@ -1,3 +1,4 @@
+import 'package:bmprogresshud/bmprogresshud.dart';
 import 'package:crop_image/crop_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -13,29 +14,35 @@ class ChangeAvatarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
-          "选择一个头像",
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: "PingFangSC",
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.white),
+          title: Text(
+            "选择一个头像",
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: "PingFangSC",
+            ),
+          ),
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: Container(
+        body: Container(
           padding: EdgeInsets.zero,
           alignment: Alignment.topCenter,
           child: LazyImgList(),
         ),
+      ),
+      onWillPop: () async {
+        ProgressHud.dismiss();
+        return true;
+      },
     );
   }
 }
@@ -57,26 +64,26 @@ class _LazyImgListState extends State<LazyImgList> {
   @override
   void initState() {
     super.initState();
-    Dio().get(avatarListUrl).then((value) {
-      print(value);
-      var list = value.toString().split('\n');
-      var _tmp = <String>[];
-      for (String line in list) {
-        _tmp.add(line);
-      }
-      setState(() {
-        imgList = _tmp;
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      ProgressHud.show(ProgressHudType.loading, "正在加载头像……");
+      Dio().get(avatarListUrl).then((value) {
+        print(value);
+        var list = value.toString().split('\n');
+        var _tmp = <String>[];
+        for (String line in list) {
+          _tmp.add(line);
+        }
+        setState(() {
+          imgList = _tmp;
+        });
+      }).onError((error, stackTrace) {
+        debugPrint("头像列表下载失败:");
+        debugPrint("error: $error");
+        ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
+        Future.delayed(Duration(seconds: 3), () => Navigator.pop(context));
+      }).then((value) {
+        ProgressHud.dismiss();
       });
-    }).onError((error, stackTrace) {
-      debugPrint("头像列表下载失败:");
-      debugPrint("error: $error");
-      debugPrint("stack trace: $stackTrace");
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('网络好像不太好？我获取不到头像列表🤔'),
-        ),
-      );
     });
   }
 
@@ -118,8 +125,7 @@ class _LazyImgListState extends State<LazyImgList> {
                       width: 0,
                     );
                   },
-                  itemCount: imgThisRow
-              ),
+                  itemCount: imgThisRow),
             );
           },
           separatorBuilder: (BuildContext context, int index) {
@@ -129,14 +135,7 @@ class _LazyImgListState extends State<LazyImgList> {
           },
           itemCount: imgList!.length ~/ imgPerRow + 1);
     } else {
-      return Center(
-        child: Text(
-          "正在获取头像列表……",
-          style: TextStyle(
-            fontFamily: "PingFangSC",
-          ),
-        ),
-      );
+      return SizedBox();
     }
   }
 }
