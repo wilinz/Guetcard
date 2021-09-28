@@ -8,10 +8,10 @@ class InputDialog extends StatelessWidget {
   final TextEditingController controller;
 
   const InputDialog({
-    Key key,
-    this.title,
-    this.onOkBtnPressed,
-    this.controller,
+    Key ?key,
+    required this.title,
+    required this.onOkBtnPressed,
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -23,7 +23,17 @@ class InputDialog extends StatelessWidget {
           controller: controller,
         ),
         Row(
-          children: [TextButton(onPressed: onOkBtnPressed, child: Text("确定"))],
+          children: [
+            TextButton(
+              onPressed: () => onOkBtnPressed(),
+              child: Text(
+                "确定",
+                style: TextStyle(
+                  fontFamily: "PingFangSC",
+                ),
+              ),
+            ),
+          ],
           mainAxisAlignment: MainAxisAlignment.end,
         )
       ],

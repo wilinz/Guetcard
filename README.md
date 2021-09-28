@@ -1,7 +1,6 @@
 # guet_card
 
 一个使用 Flutter 重写的 guet_card，支持 Android、iOS、网页端。
-
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
 
 <img src="https://i.loli.net/2021/09/21/IBPdayAor3LO7l1.png" alt="tutorial.png" style="zoom: 50%;" />

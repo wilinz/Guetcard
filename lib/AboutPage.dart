@@ -1,17 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+var VERSION = "v1.4.0";
 
 /// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {
-  const AboutPage({Key key}) : super(key: key);
-  static const md = '''
-# guet_card v1.3.1
+  AboutPage({Key? key}) : super(key: key);
+  var md = '''
+# guet_card $VERSION
 一个使用 Flutter 重写的 guet_card，支持 Android、iOS、网页端。
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
 
-![tutorial.png](https://i.loli.net/2021/09/21/IBPdayAor3LO7l1.png)
+![tutorial.png](https://i.loli.net/2021/09/25/sjYc26oa8VdRf5F.jpg)
 
 gitee 主页为：[gitee](https://gitee.com/guetcard/guetcard)
 
@@ -40,15 +43,48 @@ gitee 主页为：[gitee](https://gitee.com/guetcard/guetcard)
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("关于", style: TextStyle(color: Colors.white),),
+        title: Text(
+          "关于",
+          style: TextStyle(
+            fontFamily: "PingFangSC",
+            color: Colors.white,
+          ),
+        ),
         toolbarHeight: 50,
         iconTheme: IconThemeData(color: Colors.white),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: TextButton(
+              child: Text(
+                "下次显示教程",
+                style: TextStyle(color: Colors.white, fontFamily: "PingFangSC"),
+              ),
+              onPressed: () async {
+                var pref = await SharedPreferences.getInstance();
+                pref.setBool("isSkipGuide", false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('👌下次启动时将会显示教程'),
+                  ),
+                );
+                if (kIsWeb) {}
+              },
+            ),
+          ),
+        ],
       ),
       body: Markdown(
         data: md,
         selectable: true,
-        onTapLink: (String text, String href, String title) async {
-          await canLaunch(href)? await launch(href) : throw "url_launch 无法打开 $href";
+        onTapLink: (String text, String? href, String title) async {
+          if (href != null) {
+            await canLaunch(href)
+                ? await launch(href)
+                : throw "url_launch 无法打开 $href";
+          } else {
+            throw "点击的链接 (text: $text, title: $title) 中不包含 URL";
+          }
         },
       ),
     );

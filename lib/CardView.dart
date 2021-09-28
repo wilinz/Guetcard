@@ -10,117 +10,95 @@ import 'package:guet_card/CropAvatarPage.dart';
 import 'package:guet_card/InputDialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:qr_flutter/qr_flutter.dart' as qr;
+//import 'package:qr_flutter/qr_flutter.dart' as qr;
 import 'package:shared_preferences/shared_preferences.dart';
-
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 /// 卡片视图，包括时间、头像、二维码等信息以及外面的灰色框框
 class CardView extends StatelessWidget {
-  final double cardHeight = 880;
-  final double cardViewHeight = 840;
   final double screenWidth;
+  static double cardHeight = 1000;
+  static double cardViewHeight = cardHeight - 30;
+  static double cardWidth = 500;
 
-  const CardView({Key key, this.screenWidth}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Container(
-        height: cardHeight,
-        decoration: BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
-        child: OverflowBox(
-          child: FractionallySizedBox(
-            child: Card(
-              child: Column(
-                children: [
-                  Padding(padding: EdgeInsets.all(2)),
-                  TimerView(),
-                  AvatarView(),
-                  NameView(),
-                  SizedBox(height: 20),
-                  QrCodeView(),
-                  SizedBox(height: 20),
-                  PassportView()
-                ],
-              ),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(1))),
-              elevation: 0,
-              color: Colors.white,
-            ),
-            widthFactor: 0.93,
-          ),
-          maxHeight: cardHeight,
-          alignment: Alignment.bottomCenter,
-        ),
-      ),
-      height: cardViewHeight,
-      alignment: Alignment.topCenter,
-      decoration: BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
-    );
+  CardView({Key? key, required this.screenWidth}) {
+    CardView.cardWidth = this.screenWidth * 0.94;
+    CardView.cardHeight = 1180 / 1064 * cardWidth + 650;
+    CardView.cardViewHeight = CardView.cardHeight - 30;
   }
-}
-
-/// 头像图像显示
-class AvatarImage extends StatefulWidget {
-  String avatarPath;
-
-  AvatarImage(this.avatarPath, {Key key}) : super(key: key);
-
-  @override
-  _AvatarImageState createState() => _AvatarImageState(avatarPath);
-}
-
-class _AvatarImageState extends State<AvatarImage> {
-  String avatarPath;
-  static const _width = 90.0;
-
-  _AvatarImageState(this.avatarPath);
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
-      return Image.network(
-        avatarPath,
-        width: _width,
-      );
-    }
-    return Image.asset(
-      avatarPath,
-      width: _width,
+    return OrientationBuilder(
+      builder: (BuildContext context, Orientation orientation) {
+        CardView.cardWidth = this.screenWidth * 0.94;
+        CardView.cardHeight = 1180 / 1064 * cardWidth + 650;
+        CardView.cardViewHeight = CardView.cardHeight - 30;
+        return Container(
+          child: Container(
+            decoration:
+                BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
+            child: OverflowBox(
+              child: Container(
+                child: Card(
+                  child: Column(
+                    children: [
+                      Padding(padding: EdgeInsets.all(2)),
+                      TimerView(),
+                      AvatarView(),
+                      NameView(),
+                      QrCodeView(),
+                      SizedBox(height: 20),
+                      PassportView()
+                    ],
+                  ),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(1))),
+                  elevation: 0,
+                  color: Colors.white,
+                ),
+                width: cardWidth,
+              ),
+              maxHeight: cardHeight,
+              alignment: Alignment.bottomCenter,
+            ),
+          ),
+          height: cardViewHeight,
+          alignment: Alignment.topCenter,
+          decoration: BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
+        );
+      },
     );
   }
 }
 
 /// 头像组件，负责调用切换头像的页面及更换头像功能
 class AvatarView extends StatefulWidget {
-  const AvatarView({Key key}) : super(key: key);
+  const AvatarView({Key? key}) : super(key: key);
 
   @override
   _AvatarViewState createState() => _AvatarViewState();
 }
 
 class _AvatarViewState extends State<AvatarView> {
-  String _avatarPath = "images/default_avatar.jpg";
-  static const String _defaultAvatar = "images/default_avatar.jpg";
+  static const String _defaultAvatar = "assets/images/DefaultAvatar.jpg";
+  String _avatarPath = _defaultAvatar;
   static const _width = 90.0;
-  Image img;
+  late Image img;
 
   /// 从 SharedPreferences 加载用户自定义头像
   loadUserAvatar() async {
     if (kIsWeb) {
-      var pref = await SharedPreferences.getInstance();
-      var avatarFileName = pref.getString("userAvatar");
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? avatarFileName = pref.getString("userAvatar");
       if (avatarFileName != null) {
         setState(() {
           _avatarPath = avatarFileName;
         });
       }
     } else {
-      var pref = await SharedPreferences.getInstance();
+      SharedPreferences pref = await SharedPreferences.getInstance();
       var doc = await getApplicationDocumentsDirectory();
-      var avatarFileName = pref.getString("userAvatar");
+      String? avatarFileName = pref.getString("userAvatar");
       if (avatarFileName != null) {
         if (!avatarFileName.startsWith("http")) {
           setState(() {
@@ -137,7 +115,7 @@ class _AvatarViewState extends State<AvatarView> {
 
   /// 从磁盘中删除此前的旧头像
   deletePreviousAvatar(String lastAvatarPath) async {
-    if (lastAvatarPath != null && !(lastAvatarPath.startsWith("http"))) {
+    if (!lastAvatarPath.startsWith("http")) {
       File lastAvatar = File(lastAvatarPath);
       try {
         lastAvatar.deleteSync();
@@ -150,28 +128,20 @@ class _AvatarViewState extends State<AvatarView> {
   /// 将用户自定义头像的路径（或url）保存到 SharedPreferences 中
   saveUserAvatar(String path) async {
     var pref = await SharedPreferences.getInstance();
-    if (path != null) {
-      pref.setString("userAvatar", path);
-    }
+    pref.setString("userAvatar", path);
   }
 
   @override
   void initState() {
     super.initState();
-    if (kIsWeb) {
-      _avatarPath = "https://i.loli.net/2021/05/25/x4KC5FtQEkvf9Ob.jpg";
-    }
     loadUserAvatar();
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("avatarPath: $_avatarPath");
     if (kIsWeb) {
       // 网页版
-      img = Image.network(
-        _avatarPath,
-        width: _width,
-      );
       return TextButton(
         onPressed: () async {
           var url = await Navigator.push(context,
@@ -184,50 +154,37 @@ class _AvatarViewState extends State<AvatarView> {
             saveUserAvatar(path);
           }
         },
-        child: img,
+        child: _avatarPath.startsWith("http")
+            ? Image.network(
+                _avatarPath,
+                width: _width,
+              )
+            : Image.asset(
+                _avatarPath,
+                width: _width,
+              ),
       );
     } else {
       // 移动端
-      img;
-      if (_avatarPath.startsWith("image")) {
-        // 如果路径的开头是 image 则意味着是从 asset 中加载默认头像
-        try {
-          img = Image.asset(
-            _avatarPath,
-            width: _width,
-          );
-        } catch (e) {
-          img = Image.asset(
-            _defaultAvatar,
-            width: _width,
-          );
-        }
+      late Image img;
+      if (_avatarPath.startsWith("assets")) {
+        // 如果路径的开头是 assets 则意味着是从 asset 中加载默认头像
+        img = Image.asset(
+          _avatarPath,
+          width: _width,
+        );
       } else if (_avatarPath.startsWith("http")) {
         // 如果路径开头是 http 则意味着是从网络上加载自定义头像
-        try {
-          img = Image.network(
-            _avatarPath,
-            width: _width,
-          );
-        } catch (e) {
-          img = Image.asset(
-            _defaultAvatar,
-            width: _width,
-          );
-        }
+        img = Image.network(
+          _avatarPath,
+          width: _width,
+        );
       } else {
         // 否则从应用程序 data 目录中加载自定义头像
-        try {
-          img = Image.file(
-            File(_avatarPath),
-            width: _width,
-          );
-        } catch (e) {
-          img = Image.asset(
-            _defaultAvatar,
-            width: _width,
-          );
-        }
+        img = Image.file(
+          File(_avatarPath),
+          width: _width,
+        );
       }
       return TextButton(
           onPressed: () async {
@@ -239,9 +196,14 @@ class _AvatarViewState extends State<AvatarView> {
                     children: [
                       ListTile(
                         leading: Icon(Icons.photo_camera),
-                        title: Text("由相机拍摄"),
+                        title: Text(
+                          "由相机拍摄",
+                          style: TextStyle(
+                            fontFamily: "PingFangSC",
+                          ),
+                        ),
                         onTap: () async {
-                          var imageFile = await ImagePicker().getImage(
+                          var imageFile = await ImagePicker().pickImage(
                               source: ImageSource.camera,
                               preferredCameraDevice: CameraDevice.front);
                           if (imageFile != null) {
@@ -254,7 +216,7 @@ class _AvatarViewState extends State<AvatarView> {
                                         CropAvatarPage(_image)));
                             if (result != null) {
                               var docPath =
-                                  await getApplicationDocumentsDirectory();
+                              await getApplicationDocumentsDirectory();
                               var pref = await SharedPreferences.getInstance();
                               var lastAvatar = pref.getString("userAvatar");
                               if (lastAvatar != null &&
@@ -264,9 +226,7 @@ class _AvatarViewState extends State<AvatarView> {
                               }
                               String name = result as String;
                               setState(() {
-                                if (name != null) {
-                                  this._avatarPath = "${docPath.path}/$name";
-                                }
+                                this._avatarPath = "${docPath.path}/$name";
                               });
                               saveUserAvatar(name);
                             }
@@ -277,9 +237,14 @@ class _AvatarViewState extends State<AvatarView> {
                       ),
                       ListTile(
                         leading: Icon(Icons.photo_library),
-                        title: Text("从相册导入"),
+                        title: Text(
+                          "从相册导入",
+                          style: TextStyle(
+                            fontFamily: "PingFangSC",
+                          ),
+                        ),
                         onTap: () async {
-                          var imageFile = await ImagePicker().getImage(
+                          var imageFile = await ImagePicker().pickImage(
                             source: ImageSource.gallery,
                           );
                           if (imageFile != null) {
@@ -292,7 +257,7 @@ class _AvatarViewState extends State<AvatarView> {
                                         CropAvatarPage(_image)));
                             if (result != null) {
                               var docPath =
-                                  await getApplicationDocumentsDirectory();
+                              await getApplicationDocumentsDirectory();
                               var pref = await SharedPreferences.getInstance();
                               var lastAvatar = pref.getString("userAvatar");
                               if (lastAvatar != null &&
@@ -302,9 +267,7 @@ class _AvatarViewState extends State<AvatarView> {
                               }
                               String name = result as String;
                               setState(() {
-                                if (name != null) {
-                                  this._avatarPath = "${docPath.path}/$name";
-                                }
+                                this._avatarPath = "${docPath.path}/$name";
                               });
                               saveUserAvatar(name);
                             }
@@ -315,7 +278,10 @@ class _AvatarViewState extends State<AvatarView> {
                       ),
                       ListTile(
                         leading: Icon(Icons.image),
-                        title: Text("从默认头像中选择"),
+                        title: Text("从默认头像中选择",
+                            style: TextStyle(
+                              fontFamily: "PingFangSC",
+                            )),
                         onTap: () async {
                           var url = await Navigator.push(
                               context,
@@ -354,42 +320,60 @@ class _AvatarViewState extends State<AvatarView> {
 
 /// 二维码视图，最大尺寸为250
 class QrCodeView extends StatelessWidget {
-  static const double QrCodeSize = 250;
-
   @override
   Widget build(BuildContext context) {
     final String time =
         DateTime.now().toString().split(":").sublist(0, 2).join(":");
+    //final double QrCodeSize = 230.0;
     return Column(
       children: [
-        Stack(
-          children: [
-            qr.QrImage(
-              data: "三点几辣！饮茶先辣！做做len啊做！",
-              foregroundColor: Color.fromARGB(255, 0, 180, 0),
-              size: QrCodeSize,
-            ),
-            Container(
-              child: Container(
-                child: Text("可以通行",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 0, 180, 0),
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                    )),
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                color: Colors.white,
-              ),
-              width: QrCodeSize,
-              height: QrCodeSize,
-              alignment: Alignment.center,
-            ),
-          ],
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          width: CardView.cardWidth,
+          child: Image.asset(
+            "assets/images/QrCode.png",
+            width: CardView.cardWidth,
+          ),
+          // Transform.translate(
+          //   offset: Offset(0, -15),
+          //   child: Stack(
+          //     alignment: AlignmentDirectional.center,
+          //     children: [
+          //       qr.QrImage(
+          //         data: "三点几辣！饮茶先辣！做做len啊做！饮茶先啦！",
+          //         foregroundColor: Color(0xFF00CC00),
+          //         size: QrCodeSize,
+          //       ),
+          //       Container(
+          //         child: Container(
+          //           child: Text("可以通行",
+          //               style: TextStyle(
+          //                 fontFamily: "PingFangSC-Heavy",
+          //                 color: Color(0xFF1CBE1A),
+          //                 fontSize: 46,
+          //                 //fontWeight: FontWeight.bold,
+          //               )),
+          //           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 6),
+          //           color: Colors.white,
+          //         ),
+          //         width: QrCodeSize,
+          //         height: QrCodeSize,
+          //         alignment: Alignment.center,
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ),
         Container(
           child: Text(
             "更新时间：$time",
-            style: TextStyle(color: Colors.grey, fontSize: 15),
+            style: TextStyle(
+              fontFamily: "PingFangSC",
+              color: Colors.grey,
+              fontSize: 15,
+            ),
           ),
           padding: EdgeInsets.only(bottom: 10),
         ),
@@ -398,17 +382,23 @@ class QrCodeView extends StatelessWidget {
             Text(
               "我的行程卡",
               style: TextStyle(
+                fontFamily: "PingFangSC",
                 fontSize: 15,
                 color: Color.fromARGB(255, 0, 180, 0),
               ),
             ),
             Text(
               "      |    ",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+              style: TextStyle(
+                fontFamily: "PingFangSC",
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+              ),
             ),
             Text(
               "疫苗接种记录",
               style: TextStyle(
+                fontFamily: "PingFangSC",
                 fontSize: 15,
                 color: Color.fromARGB(255, 0, 180, 0),
               ),
@@ -417,9 +407,15 @@ class QrCodeView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
         ),
         SizedBox(height: 30),
-        Text(
-          "依托全国一体化政务服务平台\n实现跨省（区、市）数据共享和互通互认\n数据来源：国家政务服务平台（广西壮族自治区）",
-          textAlign: TextAlign.center,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            "依托全国一体化政务服务平台\n实现跨省（区、市）数据共享和互通互认\n数据来源：国家政务服务平台（广西壮族自治区）||广西自治区大数据发展局",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: "PingFangSC",
+            ),
+          ),
         ),
         SizedBox(height: 10),
         Row(
@@ -432,7 +428,10 @@ class QrCodeView extends StatelessWidget {
             SizedBox(width: 5, height: 0),
             Text(
               "可通行",
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(
+                fontFamily: "PingFangSC",
+                color: Colors.grey,
+              ),
             ),
             SizedBox(width: 30, height: 0),
             Container(
@@ -443,7 +442,10 @@ class QrCodeView extends StatelessWidget {
             SizedBox(width: 5, height: 0),
             Text(
               "限制通行",
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(
+                fontFamily: "PingFangSC",
+                color: Colors.grey,
+              ),
             ),
             SizedBox(width: 30, height: 0),
             Container(
@@ -454,7 +456,10 @@ class QrCodeView extends StatelessWidget {
             SizedBox(width: 5, height: 0),
             Text(
               "不可通行",
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(
+                fontFamily: "PingFangSC",
+                color: Colors.grey,
+              ),
             ),
           ],
           mainAxisAlignment: MainAxisAlignment.center,
@@ -467,7 +472,7 @@ class QrCodeView extends StatelessWidget {
 
 /// 显示时间（精确到毫秒）的动态组件，间隔130ms刷新一次来模拟原版小程序中的卡顿感
 class TimerView extends StatefulWidget {
-  const TimerView({Key key}) : super(key: key);
+  const TimerView({Key? key}) : super(key: key);
 
   @override
   _TimerViewState createState() => _TimerViewState();
@@ -475,7 +480,7 @@ class TimerView extends StatefulWidget {
 
 class _TimerViewState extends State<TimerView> {
   String _time = '00:00:00:00';
-  Timer _countdownTimer;
+  late Timer _countdownTimer;
   static const int _duration = 130;
 
   @override
@@ -501,9 +506,9 @@ class _TimerViewState extends State<TimerView> {
         child: Text(
           _time,
           style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-            color: Color.fromARGB(255, 0, 180, 0),
+            fontFamily: "PingFangSC-Heavy",
+            fontSize: 27,
+            color: Color(0xff0cbb0a),
           ),
         ),
       ),
@@ -513,15 +518,14 @@ class _TimerViewState extends State<TimerView> {
 
   @override
   void dispose() {
-    _countdownTimer?.cancel();
-    _countdownTimer = null;
+    _countdownTimer.cancel();
     super.dispose();
   }
 }
 
 /// 显示姓名的动态组件
 class NameView extends StatefulWidget {
-  const NameView({Key key}) : super(key: key);
+  const NameView({Key? key}) : super(key: key);
 
   @override
   _NameViewState createState() => _NameViewState();
@@ -550,21 +554,32 @@ class _NameViewState extends State<NameView> {
 
   Future<void> inputName() async {
     await showDialog<int>(
-        context: context,
-        builder: (BuildContext context) {
-          return InputDialog(
-            title: Text("请输入姓名最后一个字"),
-            onOkBtnPressed: () async {
-              var pref = await SharedPreferences.getInstance();
-              setState(() {
-                _lastWordOfName = _controller.text;
-              });
-              await pref.setString("name", _controller.text);
-              Navigator.pop(context);
-            },
-            controller: _controller,
-          );
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return InputDialog(
+          title: Text(
+            "请输入姓名最后一个字",
+            style: TextStyle(
+              fontFamily: "PingFangSC",
+            ),
+          ),
+          onOkBtnPressed: () async {
+            var pref = await SharedPreferences.getInstance();
+            setState(() {
+              if (_controller.text.length > 1) {
+                _controller.text = _controller.text.substring(0, 1);
+              }
+              _lastWordOfName = _controller.text;
+            });
+            await pref.setString("name", _controller.text);
+            Navigator.pop(context);
+          },
+          controller: _controller,
+        );
+      },
+    ).then((val) {
+      _controller.text = _lastWordOfName;
+    });
   }
 
   @override
@@ -585,9 +600,9 @@ class _NameViewState extends State<NameView> {
                   "**$_lastWordOfName 可以通行",
                   maxLines: 1,
                   style: TextStyle(
-                    color: Color(0xFF008000),
+                    fontFamily: "PingFangSC-Heavy",
+                    color: Color(0xFF007f00),
                     fontSize: 22,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -599,8 +614,8 @@ class _NameViewState extends State<NameView> {
               height: 30,
               indent: 0,
               endIndent: 0,
-              thickness: 0.5,
-              color: Colors.grey,
+              thickness: 0.2,
+              color: Color.fromARGB(50, 80, 80, 80),
             ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20),
@@ -610,18 +625,18 @@ class _NameViewState extends State<NameView> {
                     "**$_lastWordOfName的广西健康码",
                     maxLines: 1,
                     style: TextStyle(
+                      fontFamily: "PingFangSC-Heavy",
                       color: Colors.black,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
                     ),
                   ),
                   Padding(padding: EdgeInsets.symmetric(vertical: 3)),
                   Text(
                     "姓名：**$_lastWordOfName\n证件类型：身份证\n证件号码：$randNum1********$randNum2",
                     style: TextStyle(
+                      fontFamily: "PingFangSC",
                       color: Colors.grey,
-                      fontSize: 15,
-                      //fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                   ),
                   Padding(padding: EdgeInsets.symmetric(vertical: 5)),
@@ -640,10 +655,9 @@ class _NameViewState extends State<NameView> {
   }
 }
 
-
 /// 显示通行证的假按钮
 class PassportView extends StatelessWidget {
-  const PassportView({Key key}) : super(key: key);
+  const PassportView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -661,6 +675,7 @@ class PassportView extends StatelessWidget {
                   child: Text(
                     "已同意",
                     style: TextStyle(
+                      fontFamily: "PingFangSC",
                       color: Colors.white,
                       fontSize: 10,
                     ),
@@ -674,7 +689,10 @@ class PassportView extends StatelessWidget {
               ),
               Text(
                 "桂电学生桂电学生临时通行证",
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(
+                  fontFamily: "PingFangSC",
+                  color: Colors.black,
+                ),
               ),
             ],
             mainAxisAlignment: MainAxisAlignment.center,
