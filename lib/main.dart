@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:bmprogresshud/bmprogresshud.dart';
+import 'package:card_swiper/card_swiper.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -46,109 +47,25 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double _titleOffset = 0.0;
-    bool _centerTitle = true;
-    double bubbleWidth = 30.0;
-    if (!kIsWeb) {
-      _titleOffset = Platform.isIOS ? 0 : -15;
-      _centerTitle = Platform.isIOS ? true : false;
-    }
-
     return ProgressHud(
       isGlobalHud: true,
       child: MaterialApp(
-          title: '桂电畅行证',
-          theme: ThemeData(
-            primarySwatch: Colors.green,
-            brightness: Brightness.light,
+        title: '桂电畅行证',
+        theme: ThemeData(
+          snackBarTheme: SnackBarThemeData(
+            contentTextStyle: TextStyle(
+              fontFamily: "PingFangSC",
+              color: Colors.white,
+            ),
           ),
-          home: Stack(
-            children: [
-              Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Color.fromARGB(255, 9, 186, 7),
-                  title: Transform(
-                    child: Text(
-                      "桂电畅行证",
-                      style: TextStyle(
-                        fontFamily: "PingFangSC",
-                        color: Colors.white,
-                        fontSize: 17,
-                      ),
-                    ),
-                    transform:
-                        Matrix4.translationValues(_titleOffset, 0.0, 0.0),
-                  ),
-                  centerTitle: _centerTitle,
-                  leading: SizedBox(
-                    height: 40,
-                    child: Center(
-                      child: Builder(
-                        builder: (context) => OutlinedButton(
-                          // 左上角图标
-                          child: TopLeftIconImage(),
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Color.fromARGB(255, 7, 158, 6),
-                            shape: CircleBorder(),
-                            minimumSize: Size(bubbleWidth, bubbleWidth),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AboutPage(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    SizedBox(
-                      height: bubbleWidth,
-                      child: Center(
-                        child: Builder(
-                          builder: (context) => OutlinedButton(
-                            // 右上角图标
-                            child: TopRightIconsImage(),
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: Color.fromARGB(255, 7, 158, 6),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(15),
-                                ),
-                              ),
-                              padding: EdgeInsets.all(5),
-                              minimumSize: Size(90, bubbleWidth),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AboutPage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                  ],
-                  elevation: 0,
-                  toolbarHeight: 50,
-                ),
-                body: HomeContent(),
-              ),
-              Container(
-                alignment: Alignment.bottomCenter,
-                child: BottomBar(),
-              )
-            ],
-          )),
+          primarySwatch: Colors.blueGrey,
+          brightness: Brightness.light,
+        ),
+        home: Scaffold(
+          body: HomeContent(),
+          bottomNavigationBar: BottomBar(),
+        ),
+      ),
     );
   }
 }
@@ -156,19 +73,17 @@ class MyApp extends StatelessWidget {
 /// 主界面视图
 class HomeContent extends StatefulWidget {
   const HomeContent({Key? key}) : super(key: key);
+  static BuildContext? globalContext;
 
   @override
   _HomeContentState createState() => _HomeContentState();
 }
 
 class _HomeContentState extends State<HomeContent> {
-  late BuildContext globalContext;
   late SharedPreferences pref;
 
-  final String addToHomepageImageUrl =
-      "https://i.loli.net/2021/09/23/qLX2RwNy4WBgzS8.png";
-  final String showUseGuideImg =
-      "https://i.loli.net/2021/09/25/sjYc26oa8VdRf5F.jpg";
+  final String addToHomepageImageUrl = "assets/images/AddToHomepageImage.png";
+  final String showUseGuideImgUrl = "assets/images/Tutorial.jpg";
 
   Future<void> initPref() async {
     pref = await SharedPreferences.getInstance();
@@ -183,7 +98,6 @@ class _HomeContentState extends State<HomeContent> {
           return IntroImage(
             imgUrl: addToHomepageImageUrl,
             onFinished: () {
-              print("_showAddToHomepageGuide onFinished");
               Navigator.pop(context);
               onFinished();
             },
@@ -200,11 +114,9 @@ class _HomeContentState extends State<HomeContent> {
           context: context,
           barrierDismissible: false,
           builder: (BuildContext context) {
-            // TODO 使用assets中图片
             return IntroImage(
-              imgUrl: kIsWeb ? showUseGuideImg : "assets/images/tutorial.jpg",
+              imgUrl: showUseGuideImgUrl,
               onFinished: () {
-                print("_showUseGuide onFinished");
                 Navigator.pop(context);
                 pref.setBool("isSkipGuide", true);
               },
@@ -216,7 +128,6 @@ class _HomeContentState extends State<HomeContent> {
           });
     }
 
-    //pref.setBool("isSkipGuide", false);
     bool? isSkipGuide = pref.getBool("isSkipGuide");
     print("isSkipGuide: $isSkipGuide");
     if (isSkipGuide == null || isSkipGuide == false) {
@@ -281,7 +192,9 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
-    this.initPref().then((value) => this.showGuide(globalContext));
+    this
+        .initPref()
+        .then((value) => this.showGuide(HomeContent.globalContext ?? context));
     if (!kIsWeb) {
       Future.delayed(Duration(seconds: 5), this.checkForUpdate);
     }
@@ -291,148 +204,127 @@ class _HomeContentState extends State<HomeContent> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // 预加载两张教程图片
-    precacheImage(NetworkImage(addToHomepageImageUrl), context);
-    precacheImage(NetworkImage(showUseGuideImg), context);
+    precacheImage(AssetImage(addToHomepageImageUrl), context);
+    precacheImage(AssetImage(showUseGuideImgUrl), context);
   }
 
   @override
   Widget build(BuildContext context) {
-    globalContext = context;
+    HomeContent.globalContext = context;
     final size = MediaQuery.of(context).size;
-
-    return Container(
-      child: ListView(
-        children: <Widget>[
-          CheckPointView(),
-          Container(
-            height: 25,
-            decoration: BoxDecoration(color: Color.fromARGB(255, 9, 186, 7)),
+    // 模仿原版畅行码下方布局错位的空白
+    double buggyPadding = size.height * 0.1;
+    return Stack(
+      children: [
+        CheckPointImageView(),
+        TopRightButton(),
+        Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                height:
+                    size.height - (315 / 1125) * size.width - 55 - buggyPadding,
+                child: CardView(
+                  screenWidth: size.width,
+                ),
+              ),
+              SizedBox(
+                height: buggyPadding,
+              ),
+            ],
           ),
-          Container(
-            // 1180/1064 是二维码图片的长宽比
-            height: 1180 / 1064 * size.width + 670,
-            decoration:
-                BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
-            child: CardView(
-              screenWidth: size.width,
-            ),
-            alignment: Alignment.topCenter,
-          ),
-        ],
-        physics: BouncingScrollPhysics(),
-      ),
-      color: Colors.black, //Color.fromARGB(255, 9, 186, 7),
+          alignment: Alignment.bottomCenter,
+        ),
+      ],
     );
   }
 }
 
-/// 左上角图标
-class TopLeftIconImage extends StatelessWidget {
-  const TopLeftIconImage({Key? key}) : super(key: key);
-  static const _height = 20.0;
+// 检查点照片组件
+class CheckPointImageView extends StatefulWidget {
+  const CheckPointImageView({Key? key}) : super(key: key);
+
+  @override
+  _CheckPointImageViewState createState() => _CheckPointImageViewState();
+}
+
+class _CheckPointImageViewState extends State<CheckPointImageView> {
+  final List<String> checkPointImgList = [
+    "assets/images/huajiang.png",
+    "assets/images/houjie.png",
+  ];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    for (var img in checkPointImgList) {
+      precacheImage(AssetImage(img), context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      "assets/images/TopLeftIcon.png",
-      width: _height,
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: Container(
+        height: 450 / 1125 * MediaQuery.of(context).size.width,
+        width: MediaQuery.of(context).size.width,
+        child: Swiper(
+          itemBuilder: (BuildContext context, int index) {
+            return Image.asset(
+              checkPointImgList[index],
+              fit: BoxFit.fill,
+            );
+          },
+          itemCount: checkPointImgList.length,
+          onTap: (int index) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('左右滑动切换图片'),
+              ),
+            );
+          },
+        ),
+      ),
+      alignment: Alignment.topCenter,
+      decoration: BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
     );
   }
 }
 
 /// 右上角图标
-class TopRightIconsImage extends StatelessWidget {
-  const TopRightIconsImage({Key? key}) : super(key: key);
-  static const _height = 20.0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Image.asset(
-      "assets/images/TopRightIcon.png",
-      height: _height,
-    );
-  }
-}
-
-/// 检查点（即通行证下方的那行字）按钮动态视图
-class CheckPointView extends StatefulWidget {
-  const CheckPointView({Key? key}) : super(key: key);
-
-  @override
-  _CheckPointViewState createState() => _CheckPointViewState();
-}
-
-class _CheckPointViewState extends State<CheckPointView> {
-  var _checkPointName = "花江检查点";
-
-  onLabelPressed() async {
-    var checkPointName = await showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return SimpleDialog(
-                  title: const Text(
-                    '请选择扫码点',
-                    style: TextStyle(
-                      fontFamily: "PingFangSC",
-                    ),
-                  ),
-                  children: <Widget>[
-                    CheckPointDialogOption(name: "花江检查点"),
-                    CheckPointDialogOption(name: "花江后街"),
-                    CheckPointDialogOption(name: "金鸡岭正门"),
-                  ]);
-            }) ??
-        _checkPointName;
-    setState(() {
-      this._checkPointName = checkPointName;
-    });
-  }
+class TopRightButton extends StatelessWidget {
+  const TopRightButton({Key? key}) : super(key: key);
+  final double _height = 21.0;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: TextButton(
-        child: Transform(
-          transform: Matrix4.translationValues(0.0, -8.0, 0.0),
-          child: Text(
-            _checkPointName,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: "PingFangSC-Bold",
-              fontSize: 20,
-              color: Colors.white,
-            ),
-            maxLines: 1,
+      alignment: Alignment.topRight,
+      padding: EdgeInsets.only(top: 55, right: 15),
+      child: Container(
+        height: _height + 9,
+        child: OutlinedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AboutPage(),
+              ),
+            );
+          },
+          child: Image.asset(
+            "assets/images/TopRightIcon.png",
+            height: _height,
           ),
-        ),
-        onPressed: onLabelPressed,
-      ),
-      height: 50.0,
-      decoration: BoxDecoration(color: Color.fromARGB(255, 9, 186, 7)),
-    );
-  }
-}
-
-/// 选择检查点按钮列表内项目
-class CheckPointDialogOption extends StatelessWidget {
-  late final String name;
-
-  CheckPointDialogOption({Key? key, required String name}) : super(key: key) {
-    this.name = name;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SimpleDialogOption(
-      onPressed: () {
-        Navigator.pop(context, name);
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Text(
-          name,
-          style: TextStyle(
-            fontFamily: "PingFangSC",
+          style: OutlinedButton.styleFrom(
+            backgroundColor: Color(0x30000000),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
           ),
         ),
       ),

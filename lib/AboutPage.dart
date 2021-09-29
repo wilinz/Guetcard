@@ -4,7 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-var VERSION = "v1.4.1";
+var VERSION = "v1.4.2";
 
 /// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {
@@ -14,7 +14,7 @@ class AboutPage extends StatelessWidget {
 一个使用 Flutter 重写的 guet_card，支持 Android、iOS、网页端。
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
 
-![tutorial.png](https://i.loli.net/2021/09/25/sjYc26oa8VdRf5F.jpg)
+![](https://i.loli.net/2021/09/29/5nUS63TpLlmhjJZ.jpg)
 
 gitee 主页为：[gitee](https://gitee.com/guetcard/guetcard)
 

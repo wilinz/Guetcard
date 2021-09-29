@@ -10,7 +10,7 @@ import 'package:guet_card/CropAvatarPage.dart';
 import 'package:guet_card/InputDialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-//import 'package:qr_flutter/qr_flutter.dart' as qr;
+import 'package:qr_flutter/qr_flutter.dart' as qr;
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 卡片视图，包括时间、头像、二维码等信息以及外面的灰色框框
@@ -21,52 +21,38 @@ class CardView extends StatelessWidget {
   static double cardWidth = 500;
 
   CardView({Key? key, required this.screenWidth}) {
-    CardView.cardWidth = this.screenWidth * 0.94;
+    CardView.cardWidth = this.screenWidth * 0.95;
     CardView.cardHeight = 1180 / 1064 * cardWidth + 650;
     CardView.cardViewHeight = CardView.cardHeight - 30;
   }
 
   @override
   Widget build(BuildContext context) {
-    return OrientationBuilder(
-      builder: (BuildContext context, Orientation orientation) {
-        // CardView.cardWidth = this.screenWidth * 0.94;
-        // CardView.cardHeight = 1180 / 1064 * cardWidth + 650;
-        // CardView.cardViewHeight = CardView.cardHeight - 30;
-        return Container(
-          child: Container(
-            decoration:
-                BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
-            child: OverflowBox(
-              child: Container(
-                child: Card(
-                  child: Column(
-                    children: [
-                      Padding(padding: EdgeInsets.all(2)),
-                      TimerView(),
-                      AvatarView(),
-                      NameView(),
-                      QrCodeView(),
-                      SizedBox(height: 20),
-                      PassportView()
-                    ],
-                  ),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(1))),
-                  elevation: 0,
-                  color: Colors.white,
+    return Container(
+      child: Card(
+        child: Stack(
+          children: [
+            TimerView(),
+            ListView(
+              children: [
+                SizedBox(
+                  height: (kIsWeb ? 60 : 40),
                 ),
-                width: cardWidth,
-              ),
-              maxHeight: cardHeight,
-              alignment: Alignment.bottomCenter,
+                AvatarView(),
+                NameView(),
+                QrCodeView(),
+                SizedBox(height: 20),
+                PassportView()
+              ],
             ),
-          ),
-          height: cardViewHeight,
-          alignment: Alignment.topCenter,
-          decoration: BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
-        );
-      },
+          ],
+        ),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(3))),
+        elevation: 0,
+        color: Colors.white,
+      ),
+      width: cardWidth,
     );
   }
 }
@@ -332,39 +318,46 @@ class QrCodeView extends StatelessWidget {
         ),
         Container(
           width: CardView.cardWidth,
-          child: Image.asset(
-            "assets/images/QrCode.png",
-            width: CardView.cardWidth,
+          child: Stack(
+            children: [
+              Image.asset(
+                "assets/images/GoldenEdge.png",
+                width: CardView.cardWidth,
+              ),
+              Center(
+                child: Transform.translate(
+                  offset: Offset(0, 20),
+                  child: Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      qr.QrImage(
+                        data: "三点几辣！饮茶先辣！做做len啊做！饮茶先啦！",
+                        foregroundColor: Color(0xFF00CC00),
+                        size: CardView.cardWidth * 0.7,
+                      ),
+                      Container(
+                        child: Container(
+                          child: Text("可以通行",
+                              style: TextStyle(
+                                fontFamily: "PingFangSC-Heavy",
+                                color: Color(0xFF09BA07),
+                                fontSize: CardView.cardWidth * 0.14,
+                                //fontWeight: FontWeight.bold,
+                              )),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 5, vertical: 6),
+                          color: Colors.white,
+                        ),
+                        width: CardView.cardWidth - 50,
+                        height: CardView.cardWidth - 50,
+                        alignment: Alignment.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          // Transform.translate(
-          //   offset: Offset(0, -15),
-          //   child: Stack(
-          //     alignment: AlignmentDirectional.center,
-          //     children: [
-          //       qr.QrImage(
-          //         data: "三点几辣！饮茶先辣！做做len啊做！饮茶先啦！",
-          //         foregroundColor: Color(0xFF00CC00),
-          //         size: QrCodeSize,
-          //       ),
-          //       Container(
-          //         child: Container(
-          //           child: Text("可以通行",
-          //               style: TextStyle(
-          //                 fontFamily: "PingFangSC-Heavy",
-          //                 color: Color(0xFF1CBE1A),
-          //                 fontSize: 46,
-          //                 //fontWeight: FontWeight.bold,
-          //               )),
-          //           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 6),
-          //           color: Colors.white,
-          //         ),
-          //         width: QrCodeSize,
-          //         height: QrCodeSize,
-          //         alignment: Alignment.center,
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ),
         Container(
           child: Text(
@@ -481,22 +474,24 @@ class TimerView extends StatefulWidget {
 class _TimerViewState extends State<TimerView> {
   String _time = '00:00:00:00';
   late Timer _countdownTimer;
-  static const int _duration = 130;
+  final int _duration = 130;
 
   @override
   void initState() {
     super.initState();
-    _countdownTimer =
-        Timer.periodic(Duration(milliseconds: _duration), (timer) {
-      setState(() {
-        var time = DateTime.now().toString().split(' ')[1].split('.');
-        time[1] = time[1].substring(0, 2);
-        if (time[1] == '00') {
-          time[1] = '100';
-        }
-        _time = time.join(':');
-      });
-    });
+    _countdownTimer = Timer.periodic(
+      Duration(milliseconds: _duration),
+      (timer) {
+        setState(() {
+          var time = DateTime.now().toString().split(' ')[1].split('.');
+          time[1] = time[1].substring(0, 2);
+          if (time[1] == '00') {
+            time[1] = '100';
+          }
+          _time = time.join(':');
+        });
+      },
+    );
   }
 
   @override
@@ -506,7 +501,8 @@ class _TimerViewState extends State<TimerView> {
         child: Text(
           _time,
           style: TextStyle(
-            fontFamily: "PingFangSC-Heavy",
+            fontFamily: "PingFangSC",
+            fontWeight: FontWeight.bold,
             fontSize: 27,
             color: Color(0xff0cbb0a),
           ),
