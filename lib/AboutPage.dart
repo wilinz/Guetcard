@@ -4,7 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-var VERSION = "v1.4.2";
+var VERSION = "v1.4.3";
 
 /// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {
@@ -86,6 +86,42 @@ gitee 主页为：[gitee](https://gitee.com/guetcard/guetcard)
             throw "点击的链接 (text: $text, title: $title) 中不包含 URL";
           }
         },
+        styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+          p: Theme.of(context).textTheme.bodyText1!.copyWith(
+                fontFamily: "PingFangSC",
+              ),
+          a: Theme.of(context).textTheme.bodyText1!.copyWith(
+                fontFamily: "PingFangSC",
+                color: Colors.green,
+              ),
+          strong: Theme.of(context).textTheme.bodyText1!.copyWith(
+                fontFamily: "PingFangSC-Bold",
+              ),
+          h1: Theme.of(context).textTheme.headline1!.copyWith(
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 24,
+              ),
+          h2: Theme.of(context).textTheme.headline2!.copyWith(
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 20,
+              ),
+          h3: Theme.of(context).textTheme.headline3!.copyWith(
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 18,
+              ),
+          h4: Theme.of(context).textTheme.headline4!.copyWith(
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 16,
+              ),
+          h5: Theme.of(context).textTheme.headline5!.copyWith(
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 15,
+              ),
+          h6: Theme.of(context).textTheme.headline6!.copyWith(
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 14,
+              ),
+        ),
       ),
     );
   }

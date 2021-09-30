@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class IntroImage extends StatefulWidget {
   final String imgUrl;
@@ -61,8 +62,9 @@ class _IntroImageState extends State<IntroImage> {
               if (useLocalAssets) {
                 return Image.asset(imgUrl);
               }
-              return Image(
-                image: NetworkImage(imgUrl),
+              return FadeInImage.memoryNetwork(
+                placeholder: kTransparentImage,
+                image: imgUrl,
               );
             },
           )),

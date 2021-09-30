@@ -13,7 +13,40 @@ import 'package:guet_card/CardView.dart';
 import 'package:guet_card/IntroImage.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+const String avatarListUrl = kIsWeb
+    ? "https://guet-card.web.app/avatar_list.txt"
+    : "https://gitee.com/guetcard/guetcard/raw/master/avatar_list.txt";
+
+List<String> avatarList = [];
+
+const MaterialColor DarkGreen = const MaterialColor(
+  0xff103000,
+  // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
+  const <int, Color>{
+    50: const Color(0xff28451a), //10%
+    100: const Color(0xff405933), //20%
+    200: const Color(0xff586e4d), //30%
+    300: const Color(0xff708366), //40%
+    400: const Color(0xff889880), //50%
+    500: const Color(0xff9fac99), //60%
+    600: const Color(0xffb7c1b3), //70%
+    700: const Color(0xffcfd6cc), //80%
+    800: const Color(0xffe7eae6), //90%
+    900: const Color(0xffffffff), //100%
+  },
+);
+
+const networkImages = {
+  "goldenEdge": "https://i.loli.net/2021/09/30/24CyHckp91Smxrv.png",
+  "addToHomepageImage": "https://i.loli.net/2021/09/30/NScER3mYyIl51kr.png",
+  "showUseGuideImg": "https://i.loli.net/2021/09/30/3Ld6ra9PS2qNpKU.jpg",
+  "huajiang": "https://i.loli.net/2021/09/30/x3bjHMiV8Gn92FE.png",
+  "houjie": "https://i.loli.net/2021/09/30/3GZELtMsblgTnvp.png",
+  "defaultAvatar": "https://i.loli.net/2021/09/30/aiZBNsvUK3h6JIP.png",
+};
 
 void printPref() async {
   var pref = await SharedPreferences.getInstance();
@@ -58,7 +91,7 @@ class MyApp extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          primarySwatch: Colors.blueGrey,
+          primarySwatch: DarkGreen,
           brightness: Brightness.light,
         ),
         home: Scaffold(
@@ -82,11 +115,19 @@ class HomeContent extends StatefulWidget {
 class _HomeContentState extends State<HomeContent> {
   late SharedPreferences pref;
 
-  final String addToHomepageImageUrl = "assets/images/AddToHomepageImage.png";
-  final String showUseGuideImgUrl = "assets/images/Tutorial.jpg";
+  final String addToHomepageImageUrl = networkImages["addToHomepageImage"]!;
+  final String showUseGuideImgUrl =
+      kIsWeb ? networkImages["showUseGuideImg"]! : "assets/images/Tutorial.jpg";
 
   Future<void> initPref() async {
     pref = await SharedPreferences.getInstance();
+  }
+
+  // 预加载图片
+  void precacheNetworkImages(BuildContext context) {
+    networkImages.forEach((key, value) {
+      precacheImage(NetworkImage(value), context);
+    });
   }
 
   void showGuide(BuildContext globalContext) {
@@ -195,17 +236,31 @@ class _HomeContentState extends State<HomeContent> {
     this
         .initPref()
         .then((value) => this.showGuide(HomeContent.globalContext ?? context));
-    if (!kIsWeb) {
-      Future.delayed(Duration(seconds: 5), this.checkForUpdate);
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // 预加载两张教程图片
-    precacheImage(AssetImage(addToHomepageImageUrl), context);
-    precacheImage(AssetImage(showUseGuideImgUrl), context);
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      if (!kIsWeb) {
+        this.checkForUpdate();
+        Dio().get(avatarListUrl).then((value) {
+          print(value);
+          var list = value.toString().split('\n');
+          for (String line in list) {
+            avatarList.add(line);
+          }
+        }).onError((error, stackTrace) {
+          debugPrint("头像列表下载失败:");
+          debugPrint("error: $error");
+          ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
+        }).then((_) {
+          for (var img in avatarList) {
+            precacheImage(
+              NetworkImage(img),
+              context,
+            ).onError((error, stackTrace) {
+              precacheImage(NetworkImage(img), context);
+            });
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -251,18 +306,15 @@ class CheckPointImageView extends StatefulWidget {
 }
 
 class _CheckPointImageViewState extends State<CheckPointImageView> {
-  final List<String> checkPointImgList = [
-    "assets/images/huajiang.png",
-    "assets/images/houjie.png",
-  ];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    for (var img in checkPointImgList) {
-      precacheImage(AssetImage(img), context);
-    }
-  }
+  final List<String> checkPointImgList = kIsWeb
+      ? [
+          networkImages["huajiang"]!,
+          networkImages["houjie"]!,
+        ]
+      : [
+          "assets/images/huajiang.png",
+          "assets/images/houjie.png",
+        ];
 
   @override
   Widget build(BuildContext context) {
@@ -274,6 +326,13 @@ class _CheckPointImageViewState extends State<CheckPointImageView> {
         width: MediaQuery.of(context).size.width,
         child: Swiper(
           itemBuilder: (BuildContext context, int index) {
+            if (kIsWeb) {
+              return FadeInImage.memoryNetwork(
+                placeholder: kTransparentImage,
+                image: checkPointImgList[index],
+                fit: BoxFit.fill,
+              );
+            }
             return Image.asset(
               checkPointImgList[index],
               fit: BoxFit.fill,

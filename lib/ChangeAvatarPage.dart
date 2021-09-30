@@ -3,6 +3,9 @@ import 'package:crop_image/crop_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart';
+
+import "main.dart";
 
 /// 在预设头像中选择一个头像的页面
 class ChangeAvatarPage extends StatelessWidget {
@@ -34,7 +37,6 @@ class ChangeAvatarPage extends StatelessWidget {
           ),
         ),
         body: Container(
-          padding: EdgeInsets.zero,
           alignment: Alignment.topCenter,
           child: LazyImgList(),
         ),
@@ -55,37 +57,7 @@ class LazyImgList extends StatefulWidget {
 }
 
 class _LazyImgListState extends State<LazyImgList> {
-  List<String>? imgList;
-  static const String avatarListUrl =
-      "https://guet-card.web.app/avatar_list.txt";
-
   _LazyImgListState();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      ProgressHud.show(ProgressHudType.loading, "正在加载头像……");
-      Dio().get(avatarListUrl).then((value) {
-        print(value);
-        var list = value.toString().split('\n');
-        var _tmp = <String>[];
-        for (String line in list) {
-          _tmp.add(line);
-        }
-        setState(() {
-          imgList = _tmp;
-        });
-      }).onError((error, stackTrace) {
-        debugPrint("头像列表下载失败:");
-        debugPrint("error: $error");
-        ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
-        Future.delayed(Duration(seconds: 3), () => Navigator.pop(context));
-      }).then((value) {
-        ProgressHud.dismiss();
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,30 +65,34 @@ class _LazyImgListState extends State<LazyImgList> {
     final width = size.width;
     final height = size.height;
     var imgPerRow = width ~/ 120;
-    if (imgList != null) {
+    if (avatarList.length != 0) {
       return ListView.separated(
           itemBuilder: (BuildContext context, int vindex) {
             var imgThisRow = imgPerRow;
-            if (imgList!.length - (vindex * imgPerRow) < imgPerRow) {
-              imgThisRow = imgList!.length - (vindex * imgPerRow);
+            if (avatarList.length - (vindex * imgPerRow) < imgPerRow) {
+              imgThisRow = avatarList.length - (vindex * imgPerRow);
             }
-            var imgWidth = (width - 40 - (imgPerRow - 1) * 10) / imgPerRow;
+            var imgWidth = width / imgPerRow;
 
             return Container(
               height: imgWidth,
               child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (BuildContext context, int hindex) {
-                    return TextButton(
-                      onPressed: () async {
-                        Navigator.of(context)
-                            .pop(imgList![vindex * imgPerRow + hindex]);
-                      },
-                      child: Image.network(
-                        imgList![vindex * imgPerRow + hindex],
-                        width: imgWidth,
-                        height: imgWidth,
-                        fit: BoxFit.fitWidth,
+                    return Container(
+                      width: imgWidth,
+                      child: TextButton(
+                        onPressed: () async {
+                          Navigator.of(context)
+                              .pop(avatarList[vindex * imgPerRow + hindex]);
+                        },
+                        child: FadeInImage.memoryNetwork(
+                          placeholder: kTransparentImage,
+                          image: avatarList[vindex * imgPerRow + hindex],
+                          width: imgWidth,
+                          height: imgWidth,
+                          fit: BoxFit.fitWidth,
+                        ),
                       ),
                     );
                   },
@@ -133,9 +109,47 @@ class _LazyImgListState extends State<LazyImgList> {
               height: 0,
             );
           },
-          itemCount: imgList!.length ~/ imgPerRow + 1);
+          itemCount: avatarList.length ~/ imgPerRow + 1);
     } else {
-      return SizedBox();
+      return Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "网络错误，获取头像列表失败",
+            style: TextStyle(
+              fontFamily: "PingFangSC",
+            ),
+          ),
+          SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              ProgressHud.showLoading(text: "正在加载头像列表...");
+              Dio().get(avatarListUrl).then((value) {
+                print(value);
+                var list = value.toString().split('\n');
+                for (String line in list) {
+                  avatarList.add(line);
+                }
+              }).then((value) {
+                ProgressHud.showSuccessAndDismiss(text: "完成");
+                setState(() {});
+              }).onError((error, stackTrace) {
+                debugPrint("头像列表下载失败:");
+                debugPrint("error: $error");
+                ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
+              });
+            },
+            child: Text(
+              "点击重试",
+              style: TextStyle(
+                fontFamily: "PingFangSC",
+              ),
+            ),
+          )
+        ],
+      );
     }
   }
 }

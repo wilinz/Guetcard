@@ -5,13 +5,16 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:guet_card/ChangeAvatarPage.dart';
-import 'package:guet_card/CropAvatarPage.dart';
-import 'package:guet_card/InputDialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart' as qr;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transparent_image/transparent_image.dart';
+
+import 'ChangeAvatarPage.dart';
+import 'CropAvatarPage.dart';
+import 'InputDialog.dart';
+import 'main.dart';
 
 /// 卡片视图，包括时间、头像、二维码等信息以及外面的灰色框框
 class CardView extends StatelessWidget {
@@ -66,19 +69,25 @@ class AvatarView extends StatefulWidget {
 }
 
 class _AvatarViewState extends State<AvatarView> {
-  static const String _defaultAvatar = "assets/images/DefaultAvatar.jpg";
-  String _avatarPath = _defaultAvatar;
-  static const _width = 90.0;
+  final String _defaultAvatar = kIsWeb
+      ? networkImages['defaultAvatar']!
+      : "assets/images/DefaultAvatar.png";
+  late String _avatarPath;
+  final _width = 90.0;
   late Image img;
+
+  _AvatarViewState({Key? key}) {
+    _avatarPath = _defaultAvatar;
+  }
 
   /// 从 SharedPreferences 加载用户自定义头像
   loadUserAvatar() async {
     if (kIsWeb) {
       SharedPreferences pref = await SharedPreferences.getInstance();
-      String? avatarFileName = pref.getString("userAvatar");
-      if (avatarFileName != null) {
+      String? avatarUrl = pref.getString("userAvatar");
+      if (avatarUrl != null) {
         setState(() {
-          _avatarPath = avatarFileName;
+          _avatarPath = avatarUrl;
         });
       }
     } else {
@@ -86,13 +95,13 @@ class _AvatarViewState extends State<AvatarView> {
       var doc = await getApplicationDocumentsDirectory();
       String? avatarFileName = pref.getString("userAvatar");
       if (avatarFileName != null) {
-        if (!avatarFileName.startsWith("http")) {
+        if (avatarFileName.startsWith("http")) {
           setState(() {
-            _avatarPath = "${doc.path}/$avatarFileName";
+            _avatarPath = avatarFileName;
           });
         } else {
           setState(() {
-            _avatarPath = avatarFileName;
+            _avatarPath = "${doc.path}/$avatarFileName";
           });
         }
       }
@@ -140,19 +149,15 @@ class _AvatarViewState extends State<AvatarView> {
             saveUserAvatar(path);
           }
         },
-        child: _avatarPath.startsWith("http")
-            ? Image.network(
-                _avatarPath,
-                width: _width,
-              )
-            : Image.asset(
-                _avatarPath,
-                width: _width,
-              ),
+        child: FadeInImage.memoryNetwork(
+          placeholder: kTransparentImage,
+          image: _avatarPath,
+          width: _width,
+        ),
       );
     } else {
       // 移动端
-      late Image img;
+      late var img;
       if (_avatarPath.startsWith("assets")) {
         // 如果路径的开头是 assets 则意味着是从 asset 中加载默认头像
         img = Image.asset(
@@ -161,8 +166,9 @@ class _AvatarViewState extends State<AvatarView> {
         );
       } else if (_avatarPath.startsWith("http")) {
         // 如果路径开头是 http 则意味着是从网络上加载自定义头像
-        img = Image.network(
-          _avatarPath,
+        img = FadeInImage.memoryNetwork(
+          placeholder: kTransparentImage,
+          image: _avatarPath,
           width: _width,
         );
       } else {
@@ -202,7 +208,7 @@ class _AvatarViewState extends State<AvatarView> {
                                         CropAvatarPage(_image)));
                             if (result != null) {
                               var docPath =
-                              await getApplicationDocumentsDirectory();
+                                  await getApplicationDocumentsDirectory();
                               var pref = await SharedPreferences.getInstance();
                               var lastAvatar = pref.getString("userAvatar");
                               if (lastAvatar != null &&
@@ -243,7 +249,7 @@ class _AvatarViewState extends State<AvatarView> {
                                         CropAvatarPage(_image)));
                             if (result != null) {
                               var docPath =
-                              await getApplicationDocumentsDirectory();
+                                  await getApplicationDocumentsDirectory();
                               var pref = await SharedPreferences.getInstance();
                               var lastAvatar = pref.getString("userAvatar");
                               if (lastAvatar != null &&
@@ -311,6 +317,16 @@ class QrCodeView extends StatelessWidget {
     final String time =
         DateTime.now().toString().split(":").sublist(0, 2).join(":");
     //final double QrCodeSize = 230.0;
+    var goldenEdge = kIsWeb
+        ? FadeInImage.memoryNetwork(
+            placeholder: kTransparentImage,
+            image: networkImages["goldenEdge"]!,
+            width: CardView.cardWidth,
+          )
+        : Image.asset(
+            "assets/images/GoldenEdge.png",
+            width: CardView.cardWidth,
+          );
     return Column(
       children: [
         SizedBox(
@@ -320,10 +336,7 @@ class QrCodeView extends StatelessWidget {
           width: CardView.cardWidth,
           child: Stack(
             children: [
-              Image.asset(
-                "assets/images/GoldenEdge.png",
-                width: CardView.cardWidth,
-              ),
+              goldenEdge,
               Center(
                 child: Transform.translate(
                   offset: Offset(0, 20),
@@ -501,8 +514,7 @@ class _TimerViewState extends State<TimerView> {
         child: Text(
           _time,
           style: TextStyle(
-            fontFamily: "PingFangSC",
-            fontWeight: FontWeight.bold,
+            fontFamily: "PingFangSC-Heavy",
             fontSize: 27,
             color: Color(0xff0cbb0a),
           ),
