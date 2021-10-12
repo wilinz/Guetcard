@@ -4,12 +4,12 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-var VERSION = "v1.4.3";
+var VERSION = "v1.4.4";
 
 /// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {
   AboutPage({Key? key}) : super(key: key);
-  var md = '''
+  var _md = '''
 # guet_card $VERSION
 一个使用 Flutter 重写的 guet_card，支持 Android、iOS、网页端。
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
@@ -75,7 +75,7 @@ gitee 主页为：[gitee](https://gitee.com/guetcard/guetcard)
         ],
       ),
       body: Markdown(
-        data: md,
+        data: _md,
         selectable: true,
         onTapLink: (String text, String? href, String title) async {
           if (href != null) {

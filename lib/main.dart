@@ -16,6 +16,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+bool isInDebug = false;
+
 const String avatarListUrl = kIsWeb
     ? "https://guet-card.web.app/avatar_list.txt"
     : "https://gitee.com/guetcard/guetcard/raw/master/avatar_list.txt";
@@ -51,11 +53,13 @@ const networkImages = {
 void printPref() async {
   var pref = await SharedPreferences.getInstance();
   try {
-    String userAvatar = pref.getString("userAvatar") ?? "null";
-    String name = pref.getString("name") ?? "null";
-    print("userAvatar: $userAvatar\nname: $name");
+    debugPrint("User preferences:");
+    String? userAvatar = pref.getString("userAvatar");
+    String? name = pref.getString("name");
+    bool? skipGuide = pref.getBool("isSkipGuide");
+    debugPrint("userAvatar: $userAvatar\nname: $name\nisSkipGuide: $skipGuide");
   } catch (e) {
-    print(e);
+    debugPrint(e.toString());
   }
 }
 
@@ -66,6 +70,12 @@ Future<String> initPackageInfo() async {
 }
 
 void main() {
+  bool _determineDebugMode() {
+    isInDebug = true;
+    return true;
+  }
+
+  assert(_determineDebugMode());
   runApp(new MyApp());
   // 设为仅竖屏模式
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -80,20 +90,24 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    if (isInDebug) {
+      printPref();
+    }
     return ProgressHud(
       isGlobalHud: true,
       child: MaterialApp(
         title: '桂电畅行证',
         theme: ThemeData(
-          snackBarTheme: SnackBarThemeData(
-            contentTextStyle: TextStyle(
-              fontFamily: "PingFangSC",
-              color: Colors.white,
+            snackBarTheme: SnackBarThemeData(
+              contentTextStyle: TextStyle(
+                fontFamily: "PingFangSC",
+                color: Colors.white,
+              ),
             ),
-          ),
-          primarySwatch: DarkGreen,
-          brightness: Brightness.light,
-        ),
+            primarySwatch: DarkGreen,
+            brightness: Brightness.light,
+            // 设定目标平台为 iOS 以启用右滑返回手势
+            platform: TargetPlatform.iOS),
         home: Scaffold(
           body: HomeContent(),
           bottomNavigationBar: BottomBar(),
@@ -113,31 +127,24 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
-  late SharedPreferences pref;
+  late SharedPreferences _pref;
 
-  final String addToHomepageImageUrl = networkImages["addToHomepageImage"]!;
-  final String showUseGuideImgUrl =
+  final String _addToHomepageImageUrl = networkImages["addToHomepageImage"]!;
+  final String _showUseGuideImgUrl =
       kIsWeb ? networkImages["showUseGuideImg"]! : "assets/images/Tutorial.jpg";
 
-  Future<void> initPref() async {
-    pref = await SharedPreferences.getInstance();
+  Future<void> _initPref() async {
+    _pref = await SharedPreferences.getInstance();
   }
 
-  // 预加载图片
-  void precacheNetworkImages(BuildContext context) {
-    networkImages.forEach((key, value) {
-      precacheImage(NetworkImage(value), context);
-    });
-  }
-
-  void showGuide(BuildContext globalContext) {
+  void _showGuide(BuildContext globalContext) {
     void _showAddToHomepageGuide(Function() onFinished) {
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
           return IntroImage(
-            imgUrl: addToHomepageImageUrl,
+            imgUrl: _addToHomepageImageUrl,
             onFinished: () {
               Navigator.pop(context);
               onFinished();
@@ -156,10 +163,10 @@ class _HomeContentState extends State<HomeContent> {
           barrierDismissible: false,
           builder: (BuildContext context) {
             return IntroImage(
-              imgUrl: showUseGuideImgUrl,
+              imgUrl: _showUseGuideImgUrl,
               onFinished: () {
                 Navigator.pop(context);
-                pref.setBool("isSkipGuide", true);
+                _pref.setBool("isSkipGuide", true);
               },
               onSkip: () {
                 Navigator.pop(context);
@@ -169,8 +176,7 @@ class _HomeContentState extends State<HomeContent> {
           });
     }
 
-    bool? isSkipGuide = pref.getBool("isSkipGuide");
-    print("isSkipGuide: $isSkipGuide");
+    bool? isSkipGuide = _pref.getBool("isSkipGuide");
     if (isSkipGuide == null || isSkipGuide == false) {
       if (kIsWeb) {
         _showAddToHomepageGuide(_showUseGuide);
@@ -180,15 +186,105 @@ class _HomeContentState extends State<HomeContent> {
     }
   }
 
-  void checkForUpdate() async {
-    debugPrint("Check for update");
+  Future<void> _showIOSDialog(
+    BuildContext context,
+    Map<String, dynamic> updateInfo,
+  ) async {
+    showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.fromLTRB(40.0, 0, 40.0, 0),
+              decoration: new BoxDecoration(
+                color: Color(0xffffffff),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0, top: 10.0),
+                      child: Text(
+                        '是否升级到${updateInfo["versionName"]}版本',
+                        style: TextStyle(
+                          fontFamily: "PingFangSC",
+                          fontSize: 16.0,
+                          color: Color(0xff555555),
+                          decoration: TextDecoration.none,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Text(
+                      updateInfo["description"],
+                      style: TextStyle(
+                        fontFamily: "PingFangSC",
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 6.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          TextButton(
+                            child: Text(
+                              "下次再说",
+                              style: TextStyle(
+                                fontFamily: "PingFangSC",
+                                color: Color(0xffffbb5b),
+                                fontSize: 18.0,
+                              ),
+                            ),
+                            onPressed: () =>
+                                Navigator.of(context).pop(), //关闭对话框
+                          ),
+                          TextButton(
+                            child: Text(
+                              "立即前往",
+                              style: TextStyle(
+                                fontFamily: "PingFangSC",
+                                color: Color(0xffffbb5b),
+                                fontSize: 18.0,
+                              ),
+                            ),
+                            onPressed: () async {
+                              Navigator.of(context).pop(); //关闭对话框
+                              await canLaunch(updateInfo["ipaUrl"])
+                                  ? await launch(updateInfo["ipaUrl"])
+                                  : throw 'Could not launch ${updateInfo["ipaUrl"]}';
+                            },
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _checkForUpdate() async {
     String currentVersion = await initPackageInfo();
     await Dio()
         .get(
       "https://gitee.com/api/v5/repos/guetcard/guetcard/releases/latest",
     )
         .then((value) async {
-      debugPrint("Checking updates: $value.data");
       Map<String, dynamic> map = value.data;
       String remoteVersion =
           map["tag_name"].replaceAll("v", "").replaceAll(".", "");
@@ -222,7 +318,7 @@ class _HomeContentState extends State<HomeContent> {
           updateInfo['ipaUrl'] = "https://gitee.com/guetcard/guetcard/releases";
           updateInfo['versionName'] = map["tag_name"];
           updateInfo['description'] = map["body"];
-          showIOSDialog(context, updateInfo);
+          _showIOSDialog(context, updateInfo);
         }
       }
     }).onError((error, stackTrace) {
@@ -234,32 +330,31 @@ class _HomeContentState extends State<HomeContent> {
   void initState() {
     super.initState();
     this
-        .initPref()
-        .then((value) => this.showGuide(HomeContent.globalContext ?? context));
+        ._initPref()
+        .then((value) => this._showGuide(HomeContent.globalContext ?? context));
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       if (!kIsWeb) {
-        this.checkForUpdate();
-        Dio().get(avatarListUrl).then((value) {
-          print(value);
-          var list = value.toString().split('\n');
-          for (String line in list) {
-            avatarList.add(line);
-          }
-        }).onError((error, stackTrace) {
-          debugPrint("头像列表下载失败:");
-          debugPrint("error: $error");
-          ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
-        }).then((_) {
-          for (var img in avatarList) {
-            precacheImage(
-              NetworkImage(img),
-              context,
-            ).onError((error, stackTrace) {
-              precacheImage(NetworkImage(img), context);
-            });
-          }
-        });
+        this._checkForUpdate();
       }
+      // 预缓存头像列表和头像图片
+      Dio().get(avatarListUrl).then((value) {
+        var list = value.toString().split('\n');
+        for (String line in list) {
+          avatarList.add(line);
+        }
+        for (var img in avatarList) {
+          precacheImage(
+            NetworkImage(img),
+            context,
+          ).onError((error, stackTrace) {
+            precacheImage(NetworkImage(img), context);
+          });
+        }
+      }).onError((error, stackTrace) {
+        debugPrint("头像列表下载失败:");
+        debugPrint("error: $error");
+        ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
+      });
     });
   }
 
@@ -446,94 +541,4 @@ class BottomBar extends StatelessWidget {
       height: 60,
     );
   }
-}
-
-// 跳转 AppStore 更新 iOSUrl APP 在 AppStore 的链接
-Future<void> showIOSDialog(
-    BuildContext context, Map<String, dynamic> updateInfo) async {
-  showDialog<bool>(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.fromLTRB(40.0, 0, 40.0, 0),
-            decoration: new BoxDecoration(
-              color: Color(0xffffffff),
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0, top: 10.0),
-                    child: Text(
-                      '是否升级到${updateInfo["versionName"]}版本',
-                      style: TextStyle(
-                        fontFamily: "PingFangSC",
-                        fontSize: 16.0,
-                        color: Color(0xff555555),
-                        decoration: TextDecoration.none,
-                      ),
-                      textAlign: TextAlign.left,
-                    ),
-                  ),
-                  Text(
-                    updateInfo["description"],
-                    style: TextStyle(
-                      fontFamily: "PingFangSC",
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 6.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        TextButton(
-                          child: Text(
-                            "下次再说",
-                            style: TextStyle(
-                              fontFamily: "PingFangSC",
-                              color: Color(0xffffbb5b),
-                              fontSize: 18.0,
-                            ),
-                          ),
-                          onPressed: () => Navigator.of(context).pop(), //关闭对话框
-                        ),
-                        TextButton(
-                          child: Text(
-                            "立即前往",
-                            style: TextStyle(
-                              fontFamily: "PingFangSC",
-                              color: Color(0xffffbb5b),
-                              fontSize: 18.0,
-                            ),
-                          ),
-                          onPressed: () async {
-                            Navigator.of(context).pop(); //关闭对话框
-                            await canLaunch(updateInfo["ipaUrl"])
-                                ? await launch(updateInfo["ipaUrl"])
-                                : throw 'Could not launch ${updateInfo["ipaUrl"]}';
-                          },
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ],
-      );
-    },
-  );
 }

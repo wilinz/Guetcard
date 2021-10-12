@@ -2,7 +2,6 @@
     package="com.noname.guet_card">
    <application
        android:label="桂电畅行证"
-       android:requestLegacyExternalStorage="true"
        android:icon="@mipmap/ic_launcher">
        <activity
            android:name=".MainActivity"

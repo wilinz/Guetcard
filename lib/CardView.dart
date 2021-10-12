@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:bmprogresshud/bmprogresshud.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart' as qr;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:uuid/uuid.dart';
 
 import 'ChangeAvatarPage.dart';
 import 'CropAvatarPage.dart';
@@ -74,21 +77,23 @@ class _AvatarViewState extends State<AvatarView> {
       : "assets/images/DefaultAvatar.png";
   late String _avatarPath;
   final _width = 90.0;
-  late Image img;
+  late Image _img;
 
   _AvatarViewState({Key? key}) {
     _avatarPath = _defaultAvatar;
   }
 
   /// 从 SharedPreferences 加载用户自定义头像
-  loadUserAvatar() async {
+  void _loadUserAvatar() async {
     if (kIsWeb) {
       SharedPreferences pref = await SharedPreferences.getInstance();
       String? avatarUrl = pref.getString("userAvatar");
       if (avatarUrl != null) {
-        setState(() {
-          _avatarPath = avatarUrl;
-        });
+        if (mounted) {
+          setState(() {
+            _avatarPath = avatarUrl;
+          });
+        }
       }
     } else {
       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -96,32 +101,36 @@ class _AvatarViewState extends State<AvatarView> {
       String? avatarFileName = pref.getString("userAvatar");
       if (avatarFileName != null) {
         if (avatarFileName.startsWith("http")) {
-          setState(() {
-            _avatarPath = avatarFileName;
-          });
+          if (mounted) {
+            setState(() {
+              _avatarPath = avatarFileName;
+            });
+          }
         } else {
-          setState(() {
-            _avatarPath = "${doc.path}/$avatarFileName";
-          });
+          if (mounted) {
+            setState(() {
+              _avatarPath = "${doc.path}/$avatarFileName";
+            });
+          }
         }
       }
     }
   }
 
   /// 从磁盘中删除此前的旧头像
-  deletePreviousAvatar(String lastAvatarPath) async {
+  void _deletePreviousAvatar(String lastAvatarPath) async {
     if (!lastAvatarPath.startsWith("http")) {
       File lastAvatar = File(lastAvatarPath);
       try {
         lastAvatar.deleteSync();
       } catch (e) {
-        print(e);
+        debugPrint(e.toString());
       }
     }
   }
 
   /// 将用户自定义头像的路径（或url）保存到 SharedPreferences 中
-  saveUserAvatar(String path) async {
+  void _saveUserAvatar(String path) async {
     var pref = await SharedPreferences.getInstance();
     pref.setString("userAvatar", path);
   }
@@ -129,12 +138,11 @@ class _AvatarViewState extends State<AvatarView> {
   @override
   void initState() {
     super.initState();
-    loadUserAvatar();
+    _loadUserAvatar();
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("avatarPath: $_avatarPath");
     if (kIsWeb) {
       // 网页版
       return TextButton(
@@ -143,10 +151,12 @@ class _AvatarViewState extends State<AvatarView> {
               MaterialPageRoute(builder: (context) => ChangeAvatarPage()));
           if (url != null) {
             String path = url as String;
-            setState(() {
-              _avatarPath = path;
-            });
-            saveUserAvatar(path);
+            if (mounted) {
+              setState(() {
+                _avatarPath = path;
+              });
+            }
+            _saveUserAvatar(path);
           }
         },
         child: FadeInImage.memoryNetwork(
@@ -179,133 +189,172 @@ class _AvatarViewState extends State<AvatarView> {
         );
       }
       return TextButton(
-          onPressed: () async {
-            showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        leading: Icon(Icons.photo_camera),
-                        title: Text(
-                          "由相机拍摄",
-                          style: TextStyle(
-                            fontFamily: "PingFangSC",
-                          ),
-                        ),
-                        onTap: () async {
-                          var imageFile = await ImagePicker().pickImage(
-                              source: ImageSource.camera,
-                              preferredCameraDevice: CameraDevice.front);
-                          if (imageFile != null) {
-                            Navigator.pop(context);
-                            File _image = File(imageFile.path);
-                            var result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        CropAvatarPage(_image)));
-                            if (result != null) {
-                              var docPath =
-                                  await getApplicationDocumentsDirectory();
-                              var pref = await SharedPreferences.getInstance();
-                              var lastAvatar = pref.getString("userAvatar");
-                              if (lastAvatar != null &&
-                                  !lastAvatar.startsWith("http")) {
-                                deletePreviousAvatar(
-                                    "${docPath.path}/${pref.getString("userAvatar")}");
-                              }
-                              String name = result as String;
-                              setState(() {
-                                this._avatarPath = "${docPath.path}/$name";
-                              });
-                              saveUserAvatar(name);
-                            }
-                          } else {
-                            debugPrint("未获取到拍摄的照片");
-                          }
-                        },
+        onPressed: () async {
+          final ImagePicker _imgPicker = ImagePicker();
+          showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.photo_camera),
+                    title: Text(
+                      "由相机拍摄",
+                      style: TextStyle(
+                        fontFamily: "PingFangSC",
                       ),
-                      ListTile(
-                        leading: Icon(Icons.photo_library),
-                        title: Text(
-                          "从相册导入",
-                          style: TextStyle(
-                            fontFamily: "PingFangSC",
-                          ),
-                        ),
-                        onTap: () async {
-                          var imageFile = await ImagePicker().pickImage(
-                            source: ImageSource.gallery,
-                          );
-                          if (imageFile != null) {
-                            Navigator.pop(context);
-                            File _image = File(imageFile.path);
-                            var result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        CropAvatarPage(_image)));
-                            if (result != null) {
-                              var docPath =
-                                  await getApplicationDocumentsDirectory();
-                              var pref = await SharedPreferences.getInstance();
-                              var lastAvatar = pref.getString("userAvatar");
-                              if (lastAvatar != null &&
-                                  !lastAvatar.startsWith("http")) {
-                                deletePreviousAvatar(
-                                    "${docPath.path}/${pref.getString("userAvatar")}");
-                              }
-                              String name = result as String;
-                              setState(() {
-                                this._avatarPath = "${docPath.path}/$name";
-                              });
-                              saveUserAvatar(name);
-                            }
-                          } else {
-                            print("未获取到选择的图片");
+                    ),
+                    onTap: () async {
+                      var imageFile = await _imgPicker.pickImage(
+                          source: ImageSource.camera,
+                          preferredCameraDevice: CameraDevice.front);
+                      if (imageFile != null) {
+                        Navigator.pop(context);
+                        File _image = File(imageFile.path);
+                        var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CropAvatarPage(_image)));
+                        if (result != null) {
+                          var docPath =
+                              await getApplicationDocumentsDirectory();
+                          var pref = await SharedPreferences.getInstance();
+                          var lastAvatar = pref.getString("userAvatar");
+                          if (lastAvatar != null &&
+                              !lastAvatar.startsWith("http")) {
+                            _deletePreviousAvatar(
+                                "${docPath.path}/${pref.getString("userAvatar")}");
                           }
-                        },
+                          String name = result as String;
+                          if (mounted) {
+                            setState(() {
+                              this._avatarPath = "${docPath.path}/$name";
+                            });
+                          }
+                          _saveUserAvatar(name);
+                        }
+                      } else {
+                        ProgressHud.showErrorAndDismiss(text: "未获取到拍摄的照片");
+                      }
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.photo_library),
+                    title: Text(
+                      "从相册导入",
+                      style: TextStyle(
+                        fontFamily: "PingFangSC",
                       ),
-                      ListTile(
-                        leading: Icon(Icons.image),
-                        title: Text("从默认头像中选择",
-                            style: TextStyle(
-                              fontFamily: "PingFangSC",
-                            )),
-                        onTap: () async {
-                          var url = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ChangeAvatarPage()));
-                          if (url != null) {
-                            Navigator.pop(context);
-                            var docPath =
-                                await getApplicationDocumentsDirectory();
-                            var pref = await SharedPreferences.getInstance();
-                            var lastAvatar = pref.getString("userAvatar");
-                            if (lastAvatar != null &&
-                                !lastAvatar.startsWith("http")) {
-                              deletePreviousAvatar(
-                                  "${docPath.path}/${pref.getString("userAvatar")}");
-                            }
-                            String path = url as String;
+                    ),
+                    onTap: () async {
+                      var imageFile = await _imgPicker.pickImage(
+                        source: ImageSource.gallery,
+                      );
+                      if (imageFile != null) {
+                        Navigator.pop(context);
+                        File _image = File(imageFile.path);
+                        var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CropAvatarPage(_image)));
+                        if (result != null) {
+                          var docPath =
+                              await getApplicationDocumentsDirectory();
+                          var pref = await SharedPreferences.getInstance();
+                          var lastAvatar = pref.getString("userAvatar");
+                          if (lastAvatar != null &&
+                              !lastAvatar.startsWith("http")) {
+                            _deletePreviousAvatar(
+                                "${docPath.path}/${pref.getString("userAvatar")}");
+                          }
+                          String name = result as String;
+                          if (mounted) {
+                            setState(() {
+                              this._avatarPath = "${docPath.path}/$name";
+                            });
+                          }
+                          _saveUserAvatar(name);
+                        }
+                      } else {
+                        ProgressHud.showErrorAndDismiss(text: "未获取到选择的图片");
+                      }
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.image),
+                    title: Text("从默认头像中选择",
+                        style: TextStyle(
+                          fontFamily: "PingFangSC",
+                        )),
+                    onTap: () async {
+                      var url = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ChangeAvatarPage()));
+                      if (url != null) {
+                        var docPath = await getApplicationDocumentsDirectory();
+                        var pref = await SharedPreferences.getInstance();
+                        var lastAvatar = pref.getString("userAvatar");
+                        if (kIsWeb) {
+                          String path = url as String;
+                          if (mounted) {
                             setState(() {
                               _avatarPath = path;
                             });
-                            saveUserAvatar(path);
                           }
-                        },
-                      ),
-                      SizedBox(
-                        height: 10,
-                      )
-                    ],
-                  );
-                });
-          },
-          child: img);
+                          _saveUserAvatar(path);
+                        } else {
+                          ProgressHud.showLoading(text: "正在保存...");
+                          Dio dio = Dio();
+                          var dir = await getApplicationDocumentsDirectory();
+                          var name = "${Uuid().v4()}";
+                          var ext = url.toString().split(".").last;
+                          await dio
+                              .download(
+                            url,
+                            "${dir.path}/$name.$ext",
+                          )
+                              .then(
+                            (value) {
+                              if (value.statusCode == 200) {
+                                ProgressHud.dismiss();
+                                if (lastAvatar != null &&
+                                    !lastAvatar.startsWith("http")) {
+                                  _deletePreviousAvatar(
+                                      "${docPath.path}/${pref.getString("userAvatar")}");
+                                }
+                                if (mounted) {
+                                  setState(() {
+                                    _avatarPath = "${dir.path}/$name.$ext";
+                                  });
+                                }
+                                _saveUserAvatar("$name.$ext");
+                              } else {
+                                ProgressHud.dismiss();
+                                ProgressHud.showErrorAndDismiss(
+                                    text: "保存失败，请重试");
+                              }
+                            },
+                            onError: (error, stackTrace) {
+                              ProgressHud.dismiss();
+                              ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
+                            },
+                          );
+                        }
+                      }
+                    },
+                  ),
+                  SizedBox(
+                    height: 10,
+                  )
+                ],
+              );
+            },
+          );
+        },
+        child: img,
+      );
     }
   }
 }
@@ -495,14 +544,16 @@ class _TimerViewState extends State<TimerView> {
     _countdownTimer = Timer.periodic(
       Duration(milliseconds: _duration),
       (timer) {
-        setState(() {
-          var time = DateTime.now().toString().split(' ')[1].split('.');
-          time[1] = time[1].substring(0, 2);
-          if (time[1] == '00') {
-            time[1] = '100';
-          }
-          _time = time.join(':');
-        });
+        if (mounted) {
+          setState(() {
+            var time = DateTime.now().toString().split(' ')[1].split('.');
+            time[1] = time[1].substring(0, 2);
+            if (time[1] == '00') {
+              time[1] = '100';
+            }
+            _time = time.join(':');
+          });
+        }
       },
     );
   }
@@ -543,24 +594,12 @@ class _NameViewState extends State<NameView> {
   String _lastWordOfName = "";
   TextEditingController _controller = TextEditingController(text: "");
 
-  Future<String> getName() async {
+  Future<String> _getNameFromPref() async {
     var pref = await SharedPreferences.getInstance();
     return pref.getString("name") ?? "";
   }
 
-  @override
-  void initState() {
-    super.initState();
-    var name = getName();
-    name.then((String name) {
-      setState(() {
-        _lastWordOfName = name;
-        _controller.text = name;
-      });
-    });
-  }
-
-  Future<void> inputName() async {
+  Future<void> _inputName() async {
     await showDialog<int>(
       context: context,
       builder: (BuildContext context) {
@@ -573,12 +612,14 @@ class _NameViewState extends State<NameView> {
           ),
           onOkBtnPressed: () async {
             var pref = await SharedPreferences.getInstance();
-            setState(() {
-              if (_controller.text.length > 1) {
-                _controller.text = _controller.text.substring(0, 1);
-              }
-              _lastWordOfName = _controller.text;
-            });
+            if (mounted) {
+              setState(() {
+                if (_controller.text.length > 1) {
+                  _controller.text = _controller.text.substring(0, 1);
+                }
+                _lastWordOfName = _controller.text;
+              });
+            }
             await pref.setString("name", _controller.text);
             Navigator.pop(context);
           },
@@ -591,6 +632,20 @@ class _NameViewState extends State<NameView> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    var name = _getNameFromPref();
+    name.then((String name) {
+      if (mounted) {
+        setState(() {
+          _lastWordOfName = name;
+          _controller.text = name;
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final _random = Random();
     int next(int min, int max) => min + _random.nextInt(max - min);
@@ -598,7 +653,7 @@ class _NameViewState extends State<NameView> {
     final int randNum2 = next(1365, 9658);
     return TextButton(
         onPressed: () {
-          inputName();
+          _inputName();
         },
         child: Column(
           children: [

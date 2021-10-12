@@ -23,7 +23,6 @@ class IntroImage extends StatefulWidget {
     if (!imgUrl.startsWith("http")) {
       useLocalAssets = true;
     }
-    print("useLocalAssets: $useLocalAssets");
     return _IntroImageState(
       useLocalAssets: useLocalAssets,
       imgUrl: imgUrl,

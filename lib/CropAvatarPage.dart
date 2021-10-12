@@ -15,11 +15,13 @@ class CropAvatarPage extends StatefulWidget {
   File avatarImage;
 
   CropAvatarPage(this.avatarImage, {Key? key}) : super(key: key);
+
   _CropAvatarPageState createState() => new _CropAvatarPageState(avatarImage);
 }
 
 class _CropAvatarPageState extends State<CropAvatarPage> {
   File avatarImage;
+
   _CropAvatarPageState(this.avatarImage);
 
   // 是否可返回上一级页面
@@ -31,70 +33,75 @@ class _CropAvatarPageState extends State<CropAvatarPage> {
 
   @override
   Widget build(BuildContext context) {
-    assert(avatarImage != null);
-    debugPrint(avatarImage.path);
     return WillPopScope(
-      child: Scaffold(
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.white),
-        ),
-        body: Container(
-          padding: EdgeInsets.all(20),
-          child: Center(
-            child: CropImage(
-              controller: controller,
-              image: Image.file(avatarImage),
+        child: Scaffold(
+          appBar: AppBar(
+            iconTheme: IconThemeData(color: Colors.white),
+          ),
+          body: Container(
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: CropImage(
+                controller: controller,
+                image: Image.file(avatarImage),
+              ),
             ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(
-            Icons.check,
-            color: Colors.white,
-          ),
-          onPressed: () async {
-            try {
-              ProgressHud.show(ProgressHudType.loading, "保存中……");
-              setState(() {
-                isPopable = false;
-              });
-              ui.Image image =
-              await controller.croppedBitmap(quality: FilterQuality.low);
-              var dir = await getApplicationDocumentsDirectory();
-              var name = "${Uuid().v4()}.png";
-              var path = '${dir.path}/$name';
-              debugPrint("Avatar output path: ${path}");
-              File savedImage = File(path);
-              ByteData? imageData =
-              await image.toByteData(format: ui.ImageByteFormat.png);
-              if (imageData == null) {
-                throw "imageData should not be null!";
-              }
-              Uint8List pngBytes = imageData.buffer.asUint8List();
-              savedImage.writeAsBytesSync(pngBytes);
-              Navigator.of(context).pop(name);
-            } catch (e) {
-              ProgressHud.dismiss();
-              ProgressHud.showAndDismiss(ProgressHudType.error, "保存失败！");
-              setState(() {
-                isPopable = true;
-              });
-              print(e);
-            } finally {
-              ProgressHud.dismiss();
-                setState(() {
-                  isPopable = true;
-                });
+          floatingActionButton: FloatingActionButton(
+            child: Icon(
+              Icons.check,
+              color: Colors.white,
+            ),
+            onPressed: () async {
+              try {
+                ProgressHud.show(ProgressHudType.loading, "保存中……");
+                if (mounted) {
+                  setState(() {
+                    isPopable = false;
+                  });
+                } else {
+                  return;
+                }
+                ui.Image image =
+                    await controller.croppedBitmap(quality: FilterQuality.low);
+                var dir = await getApplicationDocumentsDirectory();
+                var name = "${Uuid().v4()}.png";
+                var path = '${dir.path}/$name';
+                File savedImage = File(path);
+                ByteData? imageData =
+                    await image.toByteData(format: ui.ImageByteFormat.png);
+                if (imageData == null) {
+                  throw "imageData should not be null!";
+                }
+                Uint8List pngBytes = imageData.buffer.asUint8List();
+                savedImage.writeAsBytesSync(pngBytes);
+                Navigator.of(context).pop(name);
+              } catch (e) {
+                ProgressHud.dismiss();
+                ProgressHud.showAndDismiss(ProgressHudType.error, "保存失败！");
+                if (mounted) {
+                  setState(() {
+                    isPopable = true;
+                  });
+                }
+                debugPrint(e.toString());
+              } finally {
+                ProgressHud.dismiss();
+                if (mounted) {
+                  setState(() {
+                    isPopable = true;
+                  });
+                }
                 ProgressHud.showSuccessAndDismiss(text: "保存成功！");
               }
-          },
-          backgroundColor: Colors.green,
+            },
+            backgroundColor: Colors.green,
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      ),
-      onWillPop: () async {
-        return isPopable;
-      }
-    );
+        onWillPop: () async {
+          return isPopable;
+        });
   }
 }
