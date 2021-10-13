@@ -288,6 +288,7 @@ class _AvatarViewState extends State<AvatarView> {
                           fontFamily: "PingFangSC",
                         )),
                     onTap: () async {
+                      Navigator.pop(context);
                       var url = await Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -316,7 +317,7 @@ class _AvatarViewState extends State<AvatarView> {
                             "${dir.path}/$name.$ext",
                           )
                               .then(
-                            (value) {
+                                (value) {
                               if (value.statusCode == 200) {
                                 ProgressHud.dismiss();
                                 if (lastAvatar != null &&

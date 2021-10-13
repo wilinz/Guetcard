@@ -63,9 +63,11 @@ class _LazyImgListState extends State<LazyImgList> {
     }
     await dio.get(avatarListUrl).then(
       (value) {
-        var list = value.toString().split('\n');
-        for (String line in list) {
-          avatarList.add(line);
+        if (avatarList.length == 0) {
+          var list = value.toString().split('\n');
+          for (String line in list) {
+            avatarList.add(line);
+          }
         }
         if (mounted) {
           setState(() {});

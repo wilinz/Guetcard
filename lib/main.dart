@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:bmprogresshud/bmprogresshud.dart';
@@ -189,24 +188,28 @@ class _HomeContentState extends State<HomeContent> {
         CheckingUpdate _checkingUpdate = CheckingUpdate();
         _checkingUpdate.checkForUpdate(context);
       }
-      // 预缓存头像列表和头像图片
-      Dio().get(avatarListUrl).then((value) {
-        var list = value.toString().split('\n');
-        for (String line in list) {
-          avatarList.add(line);
-        }
-        for (var img in avatarList) {
-          precacheImage(
-            NetworkImage(img),
-            context,
-          ).onError((error, stackTrace) {
-            precacheImage(NetworkImage(img), context);
-          });
-        }
-      }).onError((error, stackTrace) {
-        debugPrint("头像列表下载失败:");
-        debugPrint("error: $error");
-        ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
+      // 启动一秒后开始预缓存头像列表和头像图片
+      Future.delayed(Duration(seconds: 1), () {
+        Dio().get(avatarListUrl).then((value) {
+          if (avatarList.length == 0) {
+            var list = value.toString().split('\n');
+            for (String line in list) {
+              avatarList.add(line);
+            }
+            for (var img in avatarList) {
+              precacheImage(
+                NetworkImage(img),
+                context,
+              ).onError((error, stackTrace) {
+                precacheImage(NetworkImage(img), context);
+              });
+            }
+          }
+        }).onError((error, stackTrace) {
+          debugPrint("头像列表下载失败:");
+          debugPrint("error: $error");
+          ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
+        });
       });
     });
   }
