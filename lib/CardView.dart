@@ -392,28 +392,33 @@ class QrCodeView extends StatelessWidget {
                   child: Stack(
                     alignment: AlignmentDirectional.center,
                     children: [
-                      qr.QrImage(
-                        data: "三点几辣！饮茶先辣！做做len啊做！饮茶先啦！",
-                        foregroundColor: Color(0xFF00CC00),
-                        size: CardView.cardWidth * 0.7,
-                      ),
                       Container(
-                        child: Container(
-                          child: Text("可以通行",
-                              style: TextStyle(
-                                fontFamily: "PingFangSC-Heavy",
-                                color: Color(0xFF09BA07),
-                                fontSize: CardView.cardWidth * 0.14,
-                                //fontWeight: FontWeight.bold,
-                              )),
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 5, vertical: 6),
-                          color: Colors.white,
+                        child: qr.QrImage(
+                          data: "三点几辣！饮茶先辣！做做len啊做！饮茶先啦！",
+                          foregroundColor: Color(0xFF00CC00),
+                          size: CardView.cardWidth * 0.7,
                         ),
                         width: CardView.cardWidth - 50,
                         height: CardView.cardWidth - 50,
                         alignment: Alignment.center,
                       ),
+                      // Container(
+                      //   child: Container(
+                      //     child: Text("可以通行",
+                      //         style: TextStyle(
+                      //           fontFamily: "PingFangSC-Heavy",
+                      //           color: Color(0xFF09BA07),
+                      //           fontSize: CardView.cardWidth * 0.14,
+                      //           //fontWeight: FontWeight.bold,
+                      //         )),
+                      //     padding:
+                      //         EdgeInsets.symmetric(horizontal: 5, vertical: 6),
+                      //     color: Colors.white,
+                      //   ),
+                      //   width: CardView.cardWidth - 50,
+                      //   height: CardView.cardWidth - 50,
+                      //   alignment: Alignment.center,
+                      // ),
                     ],
                   ),
                 ),
