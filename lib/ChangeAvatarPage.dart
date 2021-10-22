@@ -66,7 +66,9 @@ class _LazyImgListState extends State<LazyImgList> {
         if (avatarList.length == 0) {
           var list = value.toString().split('\n');
           for (String line in list) {
-            avatarList.add(line);
+            if (line.length > 0 && line.startsWith("http")) {
+              avatarList.add(line);
+            }
           }
         }
         if (mounted) {

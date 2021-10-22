@@ -193,7 +193,9 @@ class _HomeContentState extends State<HomeContent> {
           if (avatarList.length == 0) {
             var list = value.toString().split('\n');
             for (String line in list) {
-              avatarList.add(line);
+              if (line.length > 0 && line.startsWith("http")) {
+                avatarList.add(line);
+              }
             }
             for (var img in avatarList) {
               precacheImage(
@@ -216,7 +218,7 @@ class _HomeContentState extends State<HomeContent> {
     HomeContent.globalContext = context;
     final size = MediaQuery.of(context).size;
     // 模仿原版畅行码下方布局错位的空白
-    double buggyPadding = size.height * 0.1;
+    double buggyPadding = size.height * 0.14;
     return Stack(
       children: [
         CheckPointImageView(),
