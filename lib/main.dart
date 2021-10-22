@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:bmprogresshud/bmprogresshud.dart';
-import 'package:card_swiper/card_swiper.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -40,8 +39,8 @@ const MaterialColor DarkGreen = const MaterialColor(
 
 const networkImages = {
   "goldenEdge": "https://i.loli.net/2021/09/30/24CyHckp91Smxrv.png",
-  "addToHomepageImage": "https://i.loli.net/2021/09/30/NScER3mYyIl51kr.png",
-  "showUseGuideImg": "https://i.loli.net/2021/09/30/3Ld6ra9PS2qNpKU.jpg",
+  "addToHomepageImage": "https://i.loli.net/2021/10/14/brJmpNK6nRYBxit.png",
+  "showUseGuideImg": "https://i.loli.net/2021/10/14/JaOkU47XBg8bftD.jpg",
   "huajiang": "https://i.loli.net/2021/09/30/x3bjHMiV8Gn92FE.png",
   "houjie": "https://i.loli.net/2021/09/30/3GZELtMsblgTnvp.png",
   "defaultAvatar": "https://i.loli.net/2021/09/30/aiZBNsvUK3h6JIP.png",
@@ -200,9 +199,7 @@ class _HomeContentState extends State<HomeContent> {
               precacheImage(
                 NetworkImage(img),
                 context,
-              ).onError((error, stackTrace) {
-                precacheImage(NetworkImage(img), context);
-              });
+              );
             }
           }
         }).onError((error, stackTrace) {
@@ -257,15 +254,8 @@ class CheckPointImageView extends StatefulWidget {
 }
 
 class _CheckPointImageViewState extends State<CheckPointImageView> {
-  final List<String> checkPointImgList = kIsWeb
-      ? [
-          networkImages["huajiang"]!,
-          networkImages["houjie"]!,
-        ]
-      : [
-          "assets/images/huajiang.png",
-          "assets/images/houjie.png",
-        ];
+  final String checkPointImg =
+      kIsWeb ? networkImages["houjie"]! : "assets/images/houjie.png";
 
   @override
   Widget build(BuildContext context) {
@@ -273,32 +263,21 @@ class _CheckPointImageViewState extends State<CheckPointImageView> {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       child: Container(
-        height: 450 / 1125 * MediaQuery.of(context).size.width,
-        width: MediaQuery.of(context).size.width,
-        child: Swiper(
-          itemBuilder: (BuildContext context, int index) {
+          height: 450 / 1125 * MediaQuery.of(context).size.width,
+          width: MediaQuery.of(context).size.width,
+          child: Builder(builder: (context) {
             if (kIsWeb) {
               return FadeInImage.memoryNetwork(
                 placeholder: kTransparentImage,
-                image: checkPointImgList[index],
+                image: checkPointImg,
                 fit: BoxFit.fill,
               );
             }
             return Image.asset(
-              checkPointImgList[index],
+              checkPointImg,
               fit: BoxFit.fill,
             );
-          },
-          itemCount: checkPointImgList.length,
-          onTap: (int index) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('左右滑动切换图片'),
-              ),
-            );
-          },
-        ),
-      ),
+          })),
       alignment: Alignment.topCenter,
       decoration: BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
     );

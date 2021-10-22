@@ -5,7 +5,7 @@ import 'package:guet_card/CheckingUpdate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-var VERSION = "v1.4.5";
+var VERSION = "v1.4.6";
 
 /// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {

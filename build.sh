@@ -15,11 +15,11 @@ deploy_web() {
 }
 
 build_apk() {
-    flutter build apk
+    flutter build apk --release --target-platform android-arm
 }
 
 build_iOS() {
-    flutter build ios
+    flutter build ios --release
 }
 
 iOS_archive() {
