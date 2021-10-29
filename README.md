@@ -1,7 +1,9 @@
-## ⚠️警告
-由于 iOS 15 的 CanvasKit 存在 bug，无法显示出页面。如已升级到 iOS 15，请按照以下步骤关闭 CanvasKit 功能：
+## 公告
+- 由于 **iOS 15** 的 CanvasKit 存在 bug，无法显示出页面。如已升级到 iOS 15，请按照以下步骤关闭 CanvasKit 功能：
 
-$\color{red}{打开「设置 - Safari 浏览器 - 高级 - Experimental Features」，找到「GPU Process: Canvas Rendering」选项，将其关闭}$
+  $\color{red}{打开「设置 - Safari 浏览器 - 高级 - Experimental Features」，找到「GPU Process: Canvas Rendering」选项，将其关闭}$
+
+- **不适用于大门人脸识别闸机，将来若后街也更换为闸机，此项目将无限期停更。**
 
 # guet_card
 
