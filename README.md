@@ -5,7 +5,7 @@
 
 - **不适用于大门人脸识别闸机，将来若后街也更换为闸机，此项目将无限期停更。**
 
-# guet_card <a href="#" onclick="document.getElementById('fork-top-button').click()"><img src="https://img.shields.io/badge/复刻-我-da282a"></img></a>
+# guet_card <a href="#"><img src="https://img.shields.io/badge/复刻-我-da282a"></img></a>
 
 一个使用 Flutter 重写的 guet_card，支持 Android、iOS、网页端。
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
