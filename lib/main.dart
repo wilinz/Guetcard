@@ -38,12 +38,13 @@ const MaterialColor DarkGreen = const MaterialColor(
 );
 
 const networkImages = {
-  "goldenEdge": "https://i.loli.net/2021/09/30/24CyHckp91Smxrv.png",
+  "goldenEdge": "https://s2.loli.net/2021/12/07/Nc2WXifen68VZgI.png",
   "addToHomepageImage": "https://i.loli.net/2021/10/14/brJmpNK6nRYBxit.png",
-  "showUseGuideImg": "https://i.loli.net/2021/10/14/JaOkU47XBg8bftD.jpg",
+  "showUseGuideImg": "https://s2.loli.net/2021/12/07/7TDvcfGIWzJkX5d.jpg",
   "huajiang": "https://i.loli.net/2021/09/30/x3bjHMiV8Gn92FE.png",
   "houjie": "https://i.loli.net/2021/09/30/3GZELtMsblgTnvp.png",
   "defaultAvatar": "https://i.loli.net/2021/09/30/aiZBNsvUK3h6JIP.png",
+  "doneInjection": "https://s2.loli.net/2021/12/07/TrkEJ3VpimfAeHC.png",
 };
 
 void printPref() async {
@@ -176,12 +177,36 @@ class _HomeContentState extends State<HomeContent> {
     }
   }
 
+  void _showAnnouncement() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("公告"),
+            content: Text("""由于市区疫情严峻，希望能与你约定以下几点：
+1. 如无必要，请勿离校
+2. 遵守防疫规定，保持安全距离
+3. 无论在校还是出市区，一旦离开住处就佩戴好口罩
+4. 不要滥用本应用，离市或出省必须向辅导员报备请假
+5. 有机会且身体允许的情况下，请注射疫苗
+"""),
+            actions: <Widget>[
+              TextButton(
+                child: Text("我会遵守约定的！"),
+                onPressed: () => Navigator.of(context).pop(), //关闭对话框
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
     this
         ._initPref()
-        .then((value) => this._showGuide(HomeContent.globalContext ?? context));
+        .then((value) => this._showGuide(HomeContent.globalContext ?? context))
+        .then((value) => this._showAnnouncement());
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       if (!kIsWeb) {
         CheckingUpdate _checkingUpdate = CheckingUpdate();
@@ -218,7 +243,6 @@ class _HomeContentState extends State<HomeContent> {
     HomeContent.globalContext = context;
     final size = MediaQuery.of(context).size;
     // 模仿原版畅行码下方布局错位的空白
-    double buggyPadding = size.height * 0.14;
     return Stack(
       children: [
         CheckPointImageView(),
@@ -229,14 +253,10 @@ class _HomeContentState extends State<HomeContent> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
-                height:
-                    size.height - (315 / 1125) * size.width - 55 - buggyPadding,
+                height: size.height - (315 / 1125) * size.width - 55,
                 child: CardView(
                   screenWidth: size.width,
                 ),
-              ),
-              SizedBox(
-                height: buggyPadding,
               ),
             ],
           ),

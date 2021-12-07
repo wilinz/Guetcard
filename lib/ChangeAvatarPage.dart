@@ -97,7 +97,6 @@ class _LazyImgListState extends State<LazyImgList> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     dio.clear();
     dio.close(force: true);
     super.dispose();

@@ -24,6 +24,8 @@ build_iOS() {
 
 iOS_archive() {
     cd build/ios/iphoneos/
+    rm -f Runner.app/*.mobileprovision
+    [ -d Runner.app/_CodeSignature ] && rm -rf Runner.app/_CodeSignature
     [ -d Payload ] && rm -rf Payload/
     mkdir Payload
     cp -r Runner.app Payload/

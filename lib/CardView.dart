@@ -143,220 +143,252 @@ class _AvatarViewState extends State<AvatarView> {
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
-      // 网页版
-      return TextButton(
-        onPressed: () async {
+    List<Widget> sheetContent = [];
+    if (!kIsWeb) {
+      // 添加移动端特有的菜单
+      final ImagePicker _imgPicker = ImagePicker();
+      sheetContent.add(
+        ListTile(
+          leading: Icon(Icons.photo_camera),
+          title: Text(
+            "由相机拍摄",
+            style: TextStyle(
+              fontFamily: "PingFangSC",
+            ),
+          ),
+          onTap: () async {
+            var imageFile = await _imgPicker.pickImage(
+                source: ImageSource.camera,
+                preferredCameraDevice: CameraDevice.front);
+            if (imageFile != null) {
+              Navigator.pop(context);
+              File _image = File(imageFile.path);
+              var result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => CropAvatarPage(_image)));
+              if (result != null) {
+                var docPath = await getApplicationDocumentsDirectory();
+                var pref = await SharedPreferences.getInstance();
+                var lastAvatar = pref.getString("userAvatar");
+                if (lastAvatar != null && !lastAvatar.startsWith("http")) {
+                  _deletePreviousAvatar(
+                      "${docPath.path}/${pref.getString("userAvatar")}");
+                }
+                String name = result as String;
+                if (mounted) {
+                  setState(() {
+                    this._avatarPath = "${docPath.path}/$name";
+                  });
+                }
+                _saveUserAvatar(name);
+              }
+            } else {
+              ProgressHud.showErrorAndDismiss(text: "未获取到拍摄的照片");
+            }
+          },
+        ),
+      );
+      sheetContent.add(
+        ListTile(
+          leading: Icon(Icons.photo_library),
+          title: Text(
+            "从相册导入",
+            style: TextStyle(
+              fontFamily: "PingFangSC",
+            ),
+          ),
+          onTap: () async {
+            var imageFile = await _imgPicker.pickImage(
+              source: ImageSource.gallery,
+            );
+            if (imageFile != null) {
+              Navigator.pop(context);
+              File _image = File(imageFile.path);
+              var result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => CropAvatarPage(_image)));
+              if (result != null) {
+                var docPath = await getApplicationDocumentsDirectory();
+                var pref = await SharedPreferences.getInstance();
+                var lastAvatar = pref.getString("userAvatar");
+                if (lastAvatar != null && !lastAvatar.startsWith("http")) {
+                  _deletePreviousAvatar(
+                      "${docPath.path}/${pref.getString("userAvatar")}");
+                }
+                String name = result as String;
+                if (mounted) {
+                  setState(() {
+                    this._avatarPath = "${docPath.path}/$name";
+                  });
+                }
+                _saveUserAvatar(name);
+              }
+            } else {
+              ProgressHud.showErrorAndDismiss(text: "未获取到选择的图片");
+            }
+          },
+        ),
+      );
+    }
+    // 添加双端通用的菜单
+    sheetContent.add(
+      ListTile(
+        leading: Icon(Icons.image),
+        title: Text("从默认头像中选择",
+            style: TextStyle(
+              fontFamily: "PingFangSC",
+            )),
+        onTap: () async {
+          Navigator.pop(context);
           var url = await Navigator.push(context,
               MaterialPageRoute(builder: (context) => ChangeAvatarPage()));
           if (url != null) {
-            String path = url as String;
+            if (kIsWeb) {
+              String path = url as String;
+              if (mounted) {
+                setState(() {
+                  _avatarPath = path;
+                });
+              }
+              _saveUserAvatar(path);
+            } else {
+              ProgressHud.showLoading(text: "正在保存...");
+              var docPath = await getApplicationDocumentsDirectory();
+              var pref = await SharedPreferences.getInstance();
+              var lastAvatar = pref.getString("userAvatar");
+              var dir = await getApplicationDocumentsDirectory();
+              var name = "${Uuid().v4()}";
+              var ext = url.toString().split(".").last;
+              Dio().download(url, "${dir.path}/$name.$ext").then(
+                (value) {
+                  if (value.statusCode == 200) {
+                    ProgressHud.dismiss();
+                    if (lastAvatar != null && !lastAvatar.startsWith("http")) {
+                      _deletePreviousAvatar(
+                          "${docPath.path}/${pref.getString("userAvatar")}");
+                    }
+                    if (mounted) {
+                      setState(() {
+                        _avatarPath = "${dir.path}/$name.$ext";
+                      });
+                    }
+                    _saveUserAvatar("$name.$ext");
+                  } else {
+                    ProgressHud.dismiss();
+                    ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
+                  }
+                },
+                onError: (error, stackTrace) {
+                  ProgressHud.dismiss();
+                  ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
+                },
+              );
+            }
+          }
+        },
+      ),
+    );
+    sheetContent.add(
+      ListTile(
+        leading: Icon(Icons.api),
+        title: Text("随机头像",
+            style: TextStyle(
+              fontFamily: "PingFangSC",
+            )),
+        onTap: () async {
+          Navigator.pop(context);
+          Future<String> getAvatarUrl() async {
+            final result =
+                await Dio().get("https://api.vvhan.com/api/avatar?type=json");
+            return result.data["avatar"];
+          }
+
+          if (kIsWeb) {
+            ProgressHud.showAndDismiss(ProgressHudType.loading, "正在加载...");
+            var url = await getAvatarUrl();
+            String path = url;
             if (mounted) {
               setState(() {
                 _avatarPath = path;
               });
             }
             _saveUserAvatar(path);
+          } else {
+            ProgressHud.showLoading(text: "正在保存...");
+            var docPath = await getApplicationDocumentsDirectory();
+            var pref = await SharedPreferences.getInstance();
+            var lastAvatar = pref.getString("userAvatar");
+            var url = await getAvatarUrl();
+            var dir = await getApplicationDocumentsDirectory();
+            var name = "${Uuid().v4()}";
+            var ext = url.toString().split(".").last;
+            Dio().download(url, "${dir.path}/$name.$ext").then(
+              (value) {
+                if (value.statusCode == 200) {
+                  ProgressHud.dismiss();
+                  if (lastAvatar != null && !lastAvatar.startsWith("http")) {
+                    _deletePreviousAvatar(
+                        "${docPath.path}/${pref.getString("userAvatar")}");
+                  }
+                  if (mounted) {
+                    setState(() {
+                      _avatarPath = "${dir.path}/$name.$ext";
+                    });
+                  }
+                  _saveUserAvatar("$name.$ext");
+                } else {
+                  ProgressHud.dismiss();
+                  ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
+                }
+              },
+              onError: (error, stackTrace) {
+                ProgressHud.dismiss();
+                ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
+              },
+            );
           }
         },
-        child: FadeInImage.memoryNetwork(
-          placeholder: kTransparentImage,
-          image: _avatarPath,
-          width: _width,
-        ),
+      ),
+    );
+    sheetContent.add(SizedBox(height: 10));
+
+    late var img;
+    if (_avatarPath.startsWith("assets")) {
+      // 如果路径的开头是 assets 则意味着是从 asset 中加载默认头像
+      img = Image.asset(
+        _avatarPath,
+        width: _width,
+      );
+    } else if (_avatarPath.startsWith("http")) {
+      // 如果路径开头是 http 则意味着是从网络上加载自定义头像
+      img = FadeInImage.memoryNetwork(
+        placeholder: kTransparentImage,
+        image: _avatarPath,
+        width: _width,
       );
     } else {
-      // 移动端
-      late var img;
-      if (_avatarPath.startsWith("assets")) {
-        // 如果路径的开头是 assets 则意味着是从 asset 中加载默认头像
-        img = Image.asset(
-          _avatarPath,
-          width: _width,
-        );
-      } else if (_avatarPath.startsWith("http")) {
-        // 如果路径开头是 http 则意味着是从网络上加载自定义头像
-        img = FadeInImage.memoryNetwork(
-          placeholder: kTransparentImage,
-          image: _avatarPath,
-          width: _width,
-        );
-      } else {
-        // 否则从应用程序 data 目录中加载自定义头像
-        img = Image.file(
-          File(_avatarPath),
-          width: _width,
-        );
-      }
-      return TextButton(
-        onPressed: () async {
-          final ImagePicker _imgPicker = ImagePicker();
-          showModalBottomSheet(
-            context: context,
-            builder: (BuildContext context) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.photo_camera),
-                    title: Text(
-                      "由相机拍摄",
-                      style: TextStyle(
-                        fontFamily: "PingFangSC",
-                      ),
-                    ),
-                    onTap: () async {
-                      var imageFile = await _imgPicker.pickImage(
-                          source: ImageSource.camera,
-                          preferredCameraDevice: CameraDevice.front);
-                      if (imageFile != null) {
-                        Navigator.pop(context);
-                        File _image = File(imageFile.path);
-                        var result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CropAvatarPage(_image)));
-                        if (result != null) {
-                          var docPath =
-                              await getApplicationDocumentsDirectory();
-                          var pref = await SharedPreferences.getInstance();
-                          var lastAvatar = pref.getString("userAvatar");
-                          if (lastAvatar != null &&
-                              !lastAvatar.startsWith("http")) {
-                            _deletePreviousAvatar(
-                                "${docPath.path}/${pref.getString("userAvatar")}");
-                          }
-                          String name = result as String;
-                          if (mounted) {
-                            setState(() {
-                              this._avatarPath = "${docPath.path}/$name";
-                            });
-                          }
-                          _saveUserAvatar(name);
-                        }
-                      } else {
-                        ProgressHud.showErrorAndDismiss(text: "未获取到拍摄的照片");
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.photo_library),
-                    title: Text(
-                      "从相册导入",
-                      style: TextStyle(
-                        fontFamily: "PingFangSC",
-                      ),
-                    ),
-                    onTap: () async {
-                      var imageFile = await _imgPicker.pickImage(
-                        source: ImageSource.gallery,
-                      );
-                      if (imageFile != null) {
-                        Navigator.pop(context);
-                        File _image = File(imageFile.path);
-                        var result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CropAvatarPage(_image)));
-                        if (result != null) {
-                          var docPath =
-                              await getApplicationDocumentsDirectory();
-                          var pref = await SharedPreferences.getInstance();
-                          var lastAvatar = pref.getString("userAvatar");
-                          if (lastAvatar != null &&
-                              !lastAvatar.startsWith("http")) {
-                            _deletePreviousAvatar(
-                                "${docPath.path}/${pref.getString("userAvatar")}");
-                          }
-                          String name = result as String;
-                          if (mounted) {
-                            setState(() {
-                              this._avatarPath = "${docPath.path}/$name";
-                            });
-                          }
-                          _saveUserAvatar(name);
-                        }
-                      } else {
-                        ProgressHud.showErrorAndDismiss(text: "未获取到选择的图片");
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.image),
-                    title: Text("从默认头像中选择",
-                        style: TextStyle(
-                          fontFamily: "PingFangSC",
-                        )),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      var url = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ChangeAvatarPage()));
-                      if (url != null) {
-                        var docPath = await getApplicationDocumentsDirectory();
-                        var pref = await SharedPreferences.getInstance();
-                        var lastAvatar = pref.getString("userAvatar");
-                        if (kIsWeb) {
-                          String path = url as String;
-                          if (mounted) {
-                            setState(() {
-                              _avatarPath = path;
-                            });
-                          }
-                          _saveUserAvatar(path);
-                        } else {
-                          ProgressHud.showLoading(text: "正在保存...");
-                          Dio dio = Dio();
-                          var dir = await getApplicationDocumentsDirectory();
-                          var name = "${Uuid().v4()}";
-                          var ext = url.toString().split(".").last;
-                          await dio
-                              .download(
-                            url,
-                            "${dir.path}/$name.$ext",
-                          )
-                              .then(
-                                (value) {
-                              if (value.statusCode == 200) {
-                                ProgressHud.dismiss();
-                                if (lastAvatar != null &&
-                                    !lastAvatar.startsWith("http")) {
-                                  _deletePreviousAvatar(
-                                      "${docPath.path}/${pref.getString("userAvatar")}");
-                                }
-                                if (mounted) {
-                                  setState(() {
-                                    _avatarPath = "${dir.path}/$name.$ext";
-                                  });
-                                }
-                                _saveUserAvatar("$name.$ext");
-                              } else {
-                                ProgressHud.dismiss();
-                                ProgressHud.showErrorAndDismiss(
-                                    text: "保存失败，请重试");
-                              }
-                            },
-                            onError: (error, stackTrace) {
-                              ProgressHud.dismiss();
-                              ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
-                            },
-                          );
-                        }
-                      }
-                    },
-                  ),
-                  SizedBox(
-                    height: 10,
-                  )
-                ],
-              );
-            },
-          );
-        },
-        child: img,
+      // 否则从应用程序 data 目录中加载自定义头像
+      img = Image.file(
+        File(_avatarPath),
+        width: _width,
       );
     }
+    return TextButton(
+      onPressed: () async {
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: sheetContent,
+            );
+          },
+        );
+      },
+      child: img,
+    );
   }
 }
 
@@ -366,16 +398,26 @@ class QrCodeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final String time =
         DateTime.now().toString().split(":").sublist(0, 2).join(":");
-    //final double QrCodeSize = 230.0;
+    final double qrCodeScale = 0.6;
     var goldenEdge = kIsWeb
         ? FadeInImage.memoryNetwork(
             placeholder: kTransparentImage,
             image: networkImages["goldenEdge"]!,
-            width: CardView.cardWidth,
+            width: CardView.cardWidth * qrCodeScale,
           )
         : Image.asset(
             "assets/images/GoldenEdge.png",
-            width: CardView.cardWidth,
+            width: CardView.cardWidth * qrCodeScale,
+          );
+    var doneInjection = kIsWeb
+        ? FadeInImage.memoryNetwork(
+            placeholder: kTransparentImage,
+            image: networkImages["doneInjection"]!,
+            width: CardView.cardWidth * 0.8,
+          )
+        : Image.asset(
+            "assets/images/DoneInjection.png",
+            width: CardView.cardWidth * 0.8,
           );
     return Column(
       children: [
@@ -383,149 +425,152 @@ class QrCodeView extends StatelessWidget {
           height: 10,
         ),
         Container(
-          width: CardView.cardWidth,
+          width: CardView.cardWidth * qrCodeScale,
           child: Stack(
             children: [
               goldenEdge,
               Center(
-                child: Transform.translate(
-                  offset: Offset(0, 20),
-                  child: Stack(
-                    alignment: AlignmentDirectional.center,
-                    children: [
-                      Container(
-                        child: qr.QrImage(
-                          data: "三点几辣！饮茶先辣！做做len啊做！饮茶先啦！",
-                          foregroundColor: Color(0xFF00CC00),
-                          size: CardView.cardWidth * 0.7,
-                        ),
-                        width: CardView.cardWidth - 50,
-                        height: CardView.cardWidth - 50,
-                        alignment: Alignment.center,
-                      ),
-                      // Container(
-                      //   child: Container(
-                      //     child: Text("可以通行",
-                      //         style: TextStyle(
-                      //           fontFamily: "PingFangSC-Heavy",
-                      //           color: Color(0xFF09BA07),
-                      //           fontSize: CardView.cardWidth * 0.14,
-                      //           //fontWeight: FontWeight.bold,
-                      //         )),
-                      //     padding:
-                      //         EdgeInsets.symmetric(horizontal: 5, vertical: 6),
-                      //     color: Colors.white,
-                      //   ),
-                      //   width: CardView.cardWidth - 50,
-                      //   height: CardView.cardWidth - 50,
-                      //   alignment: Alignment.center,
-                      // ),
-                    ],
+                child: Container(
+                  child: qr.QrImage(
+                    data: "三点几辣！饮茶先辣！做做len啊做！饮茶先啦！",
+                    foregroundColor: Color(0xFF00CC00),
+                    size: CardView.cardWidth * 0.75 * qrCodeScale,
                   ),
+                  width: CardView.cardWidth * qrCodeScale,
+                  height: CardView.cardWidth * qrCodeScale,
+                  alignment: Alignment.center,
                 ),
               ),
+              // Container(
+              //   child: Container(
+              //     child: Text("可以通行",
+              //         style: TextStyle(
+              //           fontFamily: "PingFangSC-Heavy",
+              //           color: Color(0xFF09BA07),
+              //           fontSize: CardView.cardWidth * 0.14 * qrCodeScale,
+              //           //fontWeight: FontWeight.bold,
+              //         )),
+              //     padding:
+              //     EdgeInsets.symmetric(horizontal: 5, vertical: 6),
+              //     color: Colors.white,
+              //   ),
+              //   width: CardView.cardWidth * qrCodeScale,
+              //   height: CardView.cardWidth * qrCodeScale,
+              //   alignment: Alignment.center,
+              // ),
             ],
           ),
         ),
-        Container(
-          child: Text(
-            "更新时间：$time",
-            style: TextStyle(
-              fontFamily: "PingFangSC",
-              color: Colors.grey,
-              fontSize: 15,
-            ),
+        Transform.translate(
+          offset: Offset(0, -10),
+          child: Column(
+            children: [
+              Container(
+                child: doneInjection,
+                alignment: Alignment.center,
+              ),
+              Container(
+                child: Text(
+                  "更新时间：$time",
+                  style: TextStyle(
+                    fontFamily: "PingFangSC",
+                    color: Colors.grey,
+                    fontSize: 15,
+                  ),
+                ),
+                padding: EdgeInsets.only(bottom: 10),
+              ),
+              Row(
+                children: [
+                  Text(
+                    "我的行程卡",
+                    style: TextStyle(
+                      fontFamily: "PingFangSC",
+                      fontSize: 15,
+                      color: Color.fromARGB(255, 0, 180, 0),
+                    ),
+                  ),
+                  Text(
+                    "      |    ",
+                    style: TextStyle(
+                      fontFamily: "PingFangSC",
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Text(
+                    "疫苗接种记录",
+                    style: TextStyle(
+                      fontFamily: "PingFangSC",
+                      fontSize: 15,
+                      color: Color.fromARGB(255, 0, 180, 0),
+                    ),
+                  ),
+                ],
+                mainAxisAlignment: MainAxisAlignment.center,
+              ),
+              SizedBox(height: 30),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  "依托全国一体化政务服务平台\n实现跨省（区、市）数据共享和互通互认\n数据来源：国家政务服务平台（广西壮族自治区）||广西壮族自治区大数据发展局",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: "PingFangSC",
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Container(
+                    width: 17,
+                    height: 17,
+                    color: Color(0xFF00CC00),
+                  ),
+                  SizedBox(width: 5, height: 0),
+                  Text(
+                    "可通行",
+                    style: TextStyle(
+                      fontFamily: "PingFangSC",
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(width: 30, height: 0),
+                  Container(
+                    width: 17,
+                    height: 17,
+                    color: Color(0xFFFE9900),
+                  ),
+                  SizedBox(width: 5, height: 0),
+                  Text(
+                    "限制通行",
+                    style: TextStyle(
+                      fontFamily: "PingFangSC",
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(width: 30, height: 0),
+                  Container(
+                    width: 17,
+                    height: 17,
+                    color: Color(0xFFFE0000),
+                  ),
+                  SizedBox(width: 5, height: 0),
+                  Text(
+                    "不可通行",
+                    style: TextStyle(
+                      fontFamily: "PingFangSC",
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+              )
+            ],
           ),
-          padding: EdgeInsets.only(bottom: 10),
         ),
-        Row(
-          children: [
-            Text(
-              "我的行程卡",
-              style: TextStyle(
-                fontFamily: "PingFangSC",
-                fontSize: 15,
-                color: Color.fromARGB(255, 0, 180, 0),
-              ),
-            ),
-            Text(
-              "      |    ",
-              style: TextStyle(
-                fontFamily: "PingFangSC",
-                fontSize: 18,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            Text(
-              "疫苗接种记录",
-              style: TextStyle(
-                fontFamily: "PingFangSC",
-                fontSize: 15,
-                color: Color.fromARGB(255, 0, 180, 0),
-              ),
-            ),
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
-        SizedBox(height: 30),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Text(
-            "依托全国一体化政务服务平台\n实现跨省（区、市）数据共享和互通互认\n数据来源：国家政务服务平台（广西壮族自治区）||广西自治区大数据发展局",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: "PingFangSC",
-            ),
-          ),
-        ),
-        SizedBox(height: 10),
-        Row(
-          children: [
-            Container(
-              width: 17,
-              height: 17,
-              color: Color(0xFF00CC00),
-            ),
-            SizedBox(width: 5, height: 0),
-            Text(
-              "可通行",
-              style: TextStyle(
-                fontFamily: "PingFangSC",
-                color: Colors.grey,
-              ),
-            ),
-            SizedBox(width: 30, height: 0),
-            Container(
-              width: 17,
-              height: 17,
-              color: Color(0xFFFE9900),
-            ),
-            SizedBox(width: 5, height: 0),
-            Text(
-              "限制通行",
-              style: TextStyle(
-                fontFamily: "PingFangSC",
-                color: Colors.grey,
-              ),
-            ),
-            SizedBox(width: 30, height: 0),
-            Container(
-              width: 17,
-              height: 17,
-              color: Color(0xFFFE0000),
-            ),
-            SizedBox(width: 5, height: 0),
-            Text(
-              "不可通行",
-              style: TextStyle(
-                fontFamily: "PingFangSC",
-                color: Colors.grey,
-              ),
-            ),
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-        )
       ],
     );
   }
