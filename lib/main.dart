@@ -200,7 +200,10 @@ class _HomeContentState extends State<HomeContent> {
         builder: (context) {
           return AlertDialog(
             title: Text("公告"),
-            content: Text("""由于市区疫情严峻，希望能与你约定以下几点：
+            content: Text("""
+二维码不能用来通过闸机，不要犯傻！
+-----------------            
+由于市区疫情严峻，希望能与你约定以下几点：
 1. 如无必要，请勿离校
 2. 遵守防疫规定，保持安全距离
 3. 无论在校还是出市区，一旦离开住处就佩戴好口罩
