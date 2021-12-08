@@ -14,10 +14,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:uuid/uuid.dart';
 
-import 'ChangeAvatarPage.dart';
-import 'CropAvatarPage.dart';
-import 'InputDialog.dart';
-import 'main.dart';
+import 'package:guet_card/ChangeAvatarPage.dart';
+import 'package:guet_card/CropAvatarPage.dart';
+import 'package:guet_card/InputDialog.dart';
+import 'package:guet_card/main.dart';
+import 'package:guet_card/WebImageWithIndicator.dart';
 
 /// 卡片视图，包括时间、头像、二维码等信息以及外面的灰色框框
 class CardView extends StatelessWidget {
@@ -306,7 +307,8 @@ class _AvatarViewState extends State<AvatarView> {
           }
 
           if (kIsWeb) {
-            ProgressHud.showAndDismiss(ProgressHudType.loading, "正在加载...");
+            ProgressHud.showLoading(text: "正在加载...");
+            Future.delayed(Duration(seconds: 5)).then((value) => ProgressHud.dismiss());
             var url = await getAvatarUrl();
             String path = url;
             if (mounted) {
@@ -363,9 +365,8 @@ class _AvatarViewState extends State<AvatarView> {
       );
     } else if (_avatarPath.startsWith("http")) {
       // 如果路径开头是 http 则意味着是从网络上加载自定义头像
-      img = FadeInImage.memoryNetwork(
-        placeholder: kTransparentImage,
-        image: _avatarPath,
+      img = WebImageWithIndicator(
+        imgURL: _avatarPath,
         width: _width,
       );
     } else {
