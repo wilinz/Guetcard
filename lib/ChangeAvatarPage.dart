@@ -2,9 +2,9 @@ import 'package:crop_image/crop_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:transparent_image/transparent_image.dart';
 
-import "main.dart";
+import 'package:guet_card/WebImageWithIndicator.dart';
+import "package:guet_card/main.dart";
 
 /// 在预设头像中选择一个头像的页面
 class ChangeAvatarPage extends StatelessWidget {
@@ -125,13 +125,7 @@ class _LazyImgListState extends State<LazyImgList> {
                     Navigator.of(context)
                         .pop(avatarList[vindex * imgPerRow + hindex]);
                   },
-                  child: FadeInImage.memoryNetwork(
-                    placeholder: kTransparentImage,
-                    image: avatarList[vindex * imgPerRow + hindex],
-                    width: imgWidth,
-                    height: imgWidth,
-                    fit: BoxFit.fitWidth,
-                  ),
+                  child: WebImageWithIndicator(imgURL: avatarList[vindex * imgPerRow + hindex])
                 ),
               );
             };

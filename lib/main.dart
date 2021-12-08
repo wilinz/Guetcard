@@ -5,12 +5,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:card_swiper/card_swiper.dart';
+
 import 'package:guet_card/AboutPage.dart';
 import 'package:guet_card/CardView.dart';
 import 'package:guet_card/CheckingUpdate.dart';
 import 'package:guet_card/IntroImage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:transparent_image/transparent_image.dart';
+import 'package:guet_card/WebImageWithIndicator.dart';
+
 
 bool isInDebug = false;
 
@@ -37,14 +40,28 @@ const MaterialColor DarkGreen = const MaterialColor(
   },
 );
 
+/*
 const networkImages = {
   "goldenEdge": "https://s2.loli.net/2021/12/07/Nc2WXifen68VZgI.png",
   "addToHomepageImage": "https://i.loli.net/2021/10/14/brJmpNK6nRYBxit.png",
-  "showUseGuideImg": "https://s2.loli.net/2021/12/07/7TDvcfGIWzJkX5d.jpg",
-  "huajiang": "https://i.loli.net/2021/09/30/x3bjHMiV8Gn92FE.png",
-  "houjie": "https://i.loli.net/2021/09/30/3GZELtMsblgTnvp.png",
+  "showUseGuideImg": "https://s2.loli.net/2021/12/07/z3v9TXAMJrBsOcS.jpg",
+  "jinjiling": "https://s2.loli.net/2021/12/07/3w86Zk1zs5Ccfux.jpg",
+  "huajiang": "https://s2.loli.net/2021/12/07/uTpAPq9JVgX3tQ2.jpg",
+  "houjie": "https://s2.loli.net/2021/12/07/KEuoAI2Pg7p5flh.jpg",
   "defaultAvatar": "https://i.loli.net/2021/09/30/aiZBNsvUK3h6JIP.png",
   "doneInjection": "https://s2.loli.net/2021/12/07/TrkEJ3VpimfAeHC.png",
+};
+ */
+const networkImages = {
+  "goldenEdge": "https://s4.ax1x.com/2021/12/07/ogByZj.png",
+  "addToHomepageImage": "https://s4.ax1x.com/2021/12/07/ogrXrD.png",
+  "showUseGuideImg": "https://s4.ax1x.com/2021/12/07/ogBDsg.jpg",
+  "jinjiling": "https://s4.ax1x.com/2021/12/07/ogBUit.jpg",
+  "huajiang": "https://s4.ax1x.com/2021/12/07/ogBdRf.jpg",
+  "houjie": "https://s4.ax1x.com/2021/12/07/ogBwz8.jpg",
+  "defaultAvatar": "https://s4.ax1x.com/2021/12/07/ogBtII.png",
+  "doneInjection": "https://s4.ax1x.com/2021/12/07/ogBaJP.png",
+  "topRightIcon": "https://s4.ax1x.com/2021/12/07/ogBBQS.png",
 };
 
 void printPref() async {
@@ -222,7 +239,7 @@ class _HomeContentState extends State<HomeContent> {
                 avatarList.add(line);
               }
             }
-            for (var img in avatarList) {
+            for (var img in avatarList.sublist(0, 20)) {
               precacheImage(
                 NetworkImage(img),
                 context,
@@ -276,8 +293,11 @@ class CheckPointImageView extends StatefulWidget {
 }
 
 class _CheckPointImageViewState extends State<CheckPointImageView> {
-  final String checkPointImg =
-      kIsWeb ? networkImages["houjie"]! : "assets/images/houjie.png";
+  final List<String> checkPointImgs = [
+    kIsWeb ? networkImages["houjie"]! : "assets/images/houjie.jpg",
+    kIsWeb ? networkImages["huajiang"]! : "assets/images/huajiang.jpg",
+    kIsWeb ? networkImages["jinjiling"]! : "assets/images/jinjiling.jpg",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -285,21 +305,21 @@ class _CheckPointImageViewState extends State<CheckPointImageView> {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       child: Container(
-          height: 450 / 1125 * MediaQuery.of(context).size.width,
-          width: MediaQuery.of(context).size.width,
-          child: Builder(builder: (context) {
+        height: 450 / 1125 * MediaQuery.of(context).size.width,
+        width: MediaQuery.of(context).size.width,
+        child: Swiper(
+          itemCount: 3,
+          itemBuilder: (context, index) {
             if (kIsWeb) {
-              return FadeInImage.memoryNetwork(
-                placeholder: kTransparentImage,
-                image: checkPointImg,
-                fit: BoxFit.fill,
-              );
+              return WebImageWithIndicator(imgURL: checkPointImgs[index]);
             }
             return Image.asset(
-              checkPointImg,
+              checkPointImgs[index],
               fit: BoxFit.fill,
             );
-          })),
+          },
+        ),
+      ),
       alignment: Alignment.topCenter,
       decoration: BoxDecoration(color: Color.fromARGB(255, 242, 242, 242)),
     );
@@ -327,10 +347,19 @@ class TopRightButton extends StatelessWidget {
               ),
             );
           },
-          child: Image.asset(
-            "assets/images/TopRightIcon.png",
-            height: _height,
-          ),
+          child: Builder(builder: (context) {
+            if (kIsWeb) {
+              return Image.network(
+                networkImages["topRightIcon"]!,
+                height: _height,
+              );
+            } else {
+              return Image.asset(
+                "assets/images/TopRightIcon.png",
+                height: _height,
+              );
+            }
+          }),
           style: OutlinedButton.styleFrom(
             backgroundColor: Color(0x30000000),
             shape: RoundedRectangleBorder(
