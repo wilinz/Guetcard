@@ -132,11 +132,13 @@ class CheckingUpdate {
             isWifiOnly: false,
           );
           UpdateEntity updateEntity = UpdateEntity(
-              hasUpdate: true,
-              versionCode: int.parse(remoteVersion),
-              versionName: map["tag_name"],
-              updateContent: map["body"],
-              downloadUrl: apkUrl);
+            isIgnorable: true,
+            hasUpdate: true,
+            versionCode: int.parse(remoteVersion),
+            versionName: map["tag_name"],
+            updateContent: map["body"],
+            downloadUrl: apkUrl,
+          );
           FlutterXUpdate.updateByInfo(updateEntity: updateEntity);
         } else if (Platform.isIOS) {
           Map<String, dynamic> updateInfo = {

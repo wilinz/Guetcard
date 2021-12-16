@@ -15,7 +15,7 @@ deploy_web() {
 }
 
 build_apk() {
-    flutter build apk --release --target-platform android-arm
+    flutter build apk --release --target-platform android-arm,android-x64 --split-per-abi
 }
 
 build_iOS() {

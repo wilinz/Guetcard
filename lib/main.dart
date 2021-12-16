@@ -18,7 +18,7 @@ import 'package:guet_card/WebImageWithIndicator.dart';
 bool isInDebug = false;
 
 const String avatarListUrl = kIsWeb
-    ? "https://guet-card.web.app/avatar_list.txt"
+    ? "/avatar_list.txt"
     : "https://gitee.com/guetcard/guetcard/raw/master/avatar_list.txt";
 
 List<String> avatarList = [];

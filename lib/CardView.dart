@@ -667,7 +667,7 @@ class _NameViewState extends State<NameView> {
             if (mounted) {
               setState(() {
                 if (_controller.text.length > 1) {
-                  _controller.text = _controller.text.substring(0, 1);
+                  _controller.text = _controller.text.characters.first;
                 }
                 _lastWordOfName = _controller.text;
               });
