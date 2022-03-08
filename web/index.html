@@ -1,81 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+    <!--
+      If you are serving your web app in a path other than the root, change the
+      href value below to reflect the base path you are serving from.
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
+      The path provided below has to start and end with a slash "/" in order for
+      it to work correctly.
 
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-  -->
-  <base href="/">
+      For more details:
+      * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+    -->
+    <base href="/">
 
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+    <meta charset="UTF-8">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <meta name="description" content="A new Flutter project.">
 
-  <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="guet_card">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="guet_card">
+    <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <title>guet_card</title>
-  <link rel="manifest" href="manifest.json">
-  <script>
-    function getCookie(cookie_name) {
-      if (document.cookie.length > 0) {
-        var cookie_start = document.cookie.indexOf(cookie_name+"=");
-        if (cookie_start > -1) {
-          cookie_start = cookie_start + cookie_name.length + 1;
-          cookie_end = document.cookie.indexOf(";", cookie_start);
-          if (cookie_end == -1)
-            cookie_end = document.cookie.length;
-          var result = unescape(document.cookie.substring(cookie_start, cookie_end));
-          console.log("Got cookie:", cookie_name, result);
-          return result;
-        }
-      } else {
-        console.log("Got cookie:", cookie_name, null);
-        return null;
-      }
-    }
-    function setCookie(c_name,value,expiredays)
-    {
-      console.log("Setting cookie:", c_name, value);
-      var exdate = new Date();
-      exdate.setDate(exdate.getDate()+expiredays);
-      document.cookie = c_name + "=" + escape(value) +
-        ((expiredays==null) ? "" : (";expires=" + exdate.toGMTString()))
-    }
-    var version = navigator.appVersion;
-    if (version.includes("Safari")
-      && version.includes("Version/15")) {
-        console.log("Running on Safari 15, will force using HTML as renderer.");
-        window.flutterWebRenderer = "html";
-        if (getCookie("showConfirm") != "false" && window.navigator.standalone == false) {
-          var r = window.confirm(
-            "您正在使用 iOS 15 操作系统，由于 iOS 15 自身的 bug，您需要进行一些设置来保证程序正常加载。\n点击确定为您跳转到教程，一旦确定，将来启动时不会再显示此信息。");
-          if (r) {
-            // 用户确认
-            setCookie("showConfirm", "false");
-            window.location.href = "https://gitee.com/guetcard/guetcard/issues/I4BET6#note_6779529_link";
-          } else {
-            // 用户取消
-          }
-        }
-    }
-  </script>
+    <title>guet_card</title>
+    <link rel="manifest" href="manifest.json">
+    <!-- Apple WebGL 2.0 fix (https://github.com/flutter/flutter/issues/89655#issuecomment-919685843) -->
+    <!-- TODO: Remove when https://github.com/flutter/engine/pull/29038 is merged to stable -->
+    <script src="https://unpkg.com/platform@1.3.5/platform.js"></script>
+    <script type="text/javascript">
+       let isSafari = /^((?!chrome|android).)*safari/i.test(platform.ua);
+       if (isSafari) {
+          HTMLCanvasElement.prototype.getContext = function (orig) {
+             return function (type) {
+                return type !== "webgl2" ? orig.apply(this, arguments) : null
+             }
+          }(HTMLCanvasElement.prototype.getContext)
+       }
+    </script>
 </head>
 <body>
-  <!-- This script installs service_worker.js to provide PWA functionality to
-       application. For more information, see:
-       https://developers.google.com/web/fundamentals/primers/service-workers -->
-  <div align="center" style="font-size:36px">程序正在加载中，请稍候...</div>
-  <script>
+<!-- This script installs service_worker.js to provide PWA functionality to
+     application. For more information, see:
+     https://developers.google.com/web/fundamentals/primers/service-workers -->
+<div align="center" style="font-size:72px">程序正在加载中，请稍候...</div>
+<script>
     var serviceWorkerVersion = null;
     var scriptLoaded = false;
     function loadMainDartJs() {
@@ -138,6 +107,7 @@
       // Service workers not supported. Just drop the <script> tag.
       loadMainDartJs();
     }
-  </script>
+
+</script>
 </body>
 </html>
