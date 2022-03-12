@@ -7,7 +7,7 @@
 一个使用 Flutter 重写的 guet_card，支持 Android、iOS、网页端。
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
 
-<img src="https://i.loli.net/2021/09/29/5nUS63TpLlmhjJZ.jpg" alt="tutorial.png" style="zoom: 50%;" />
+<img src="https://s1.ax1x.com/2022/03/12/bTN526.jpg" alt="tutorial.png" style="zoom: 30%;" />
 
 ## 安装和使用
 1. 如果你是安卓用户：
@@ -19,7 +19,7 @@
 
     <img src="https://i.loli.net/2021/09/22/1m5Aj7txbpklY9E.jpg" style="zoom: 33%;" />
 
-    2. 使用 AltStore 自签或越狱后安装 [release](https://gitee.com/guetcard/guetcard/releases) 页面中的 ipa 安装包。
+    2. 使用 AltStore 自签或越狱后安装 [release](https://gitee.com/guetcard/guetcard/releases) 页面中的 ipa 安装包。如果你已经安装了 AltStore，你可以点击[这个链接](altstore://install?url=https://gitee.com/guetcard/guetcard/attach_files/989815/download/guet_card_v1.5.0.ipa)来一键跳转 AltStore 并安装 guet_card.
 
 ## 构建
 ```
