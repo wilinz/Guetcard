@@ -19,7 +19,7 @@
 
     <img src="https://i.loli.net/2021/09/22/1m5Aj7txbpklY9E.jpg" style="zoom: 33%;" />
 
-    2. 使用 AltStore 自签或越狱后安装 [release](https://gitee.com/guetcard/guetcard/releases) 页面中的 ipa 安装包。如果你已经安装了 AltStore，你可以点击[这个链接](altstore://install?url=https://gitee.com/guetcard/guetcard/attach_files/989815/download/guet_card_v1.5.0.ipa)来一键跳转 AltStore 并安装 guet_card.
+    2. 使用 AltStore 自签或越狱后安装 [release](https://gitee.com/guetcard/guetcard/releases) 页面中的 ipa 安装包。
 
 ## 构建
 ```
