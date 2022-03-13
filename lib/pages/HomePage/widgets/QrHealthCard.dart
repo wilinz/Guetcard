@@ -8,7 +8,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 
 import '../../../Const.dart';
-import '../../../UsernameModel.dart';
+import '../../../public-classes/UsernameModel.dart';
 
 
 /// 健康码卡片视图

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// 用于加载网络图像的组件，该组件会在图像未加载完成时展示一个圆形进度条

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// 反诈中心卡片
 class AntiScamCard extends StatelessWidget {
   const AntiScamCard({Key? key}) : super(key: key);
 

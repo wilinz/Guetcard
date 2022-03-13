@@ -38,7 +38,9 @@ class _ClockState extends State<Clock> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
+      height: 60,
+      color: Colors.white,
       child: Center(
         child: Text(
           _time,
@@ -49,7 +51,6 @@ class _ClockState extends State<Clock> {
           ),
         ),
       ),
-      height: 60,
     );
   }
 

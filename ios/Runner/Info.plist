@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>桂电畅行证</string>
+	<string>GUET Passport</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -28,9 +28,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>为了使用相机拍摄头像，我们需要你的相机权限</string>
+	<string>Take photo as avatar</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>为了从相册中选择头像，我们需要你的相册权限</string>
+	<string>Select avatar from photo library</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

@@ -5,7 +5,7 @@ class UsernameModel with ChangeNotifier {
   UsernameModel(this._username);
 
   set username(String name) {
-    _username = name.characters.first;
+    _username = (name.length > 0) ? name.characters.first : "";
     notifyListeners();
   }
   String get username => _username;

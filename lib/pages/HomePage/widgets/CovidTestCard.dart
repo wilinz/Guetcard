@@ -4,6 +4,7 @@ import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
 import '../../../Const.dart';
 
+/// 核酸检测卡片
 class CovidTestCard extends StatelessWidget {
   const CovidTestCard({Key? key}) : super(key: key);
 

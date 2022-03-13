@@ -1,8 +1,8 @@
-import 'package:guet_card/UsernameModel.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../public-classes/UsernameModel.dart';
 import '../../../public-widgets/InputDialog.dart';
 
 /// 显示姓名的动态组件
@@ -53,9 +53,10 @@ class _NameState extends State<Name> {
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((duration){
-      var name = _getNameFromPref();
-      name.then((String name) async {
-        Provider.of<UsernameModel>(context, listen: false).username = name;
+      _getNameFromPref().then((String name) async {
+        Provider
+            .of<UsernameModel>(context, listen: false)
+            .username = name;
         _controller.text = name;
       });
     });

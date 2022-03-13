@@ -1,34 +1,18 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:guet_card/UsernameModel.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:guet_card/pages/HomePage/HomePage.dart';
 
+import 'pages/HomePage/HomePage.dart';
+import 'public-classes/UsernameModel.dart';
 
+import 'public-classes/WebJSMethods.dart';
 
 
 List<String> avatarList = [];
 
-const MaterialColor DarkGreen = const MaterialColor(
-  0xff103000,
-  // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
-  const <int, Color>{
-    50: const Color(0xff28451a), //10%
-    100: const Color(0xff405933), //20%
-    200: const Color(0xff586e4d), //30%
-    300: const Color(0xff708366), //40%
-    400: const Color(0xff889880), //50%
-    500: const Color(0xff9fac99), //60%
-    600: const Color(0xffb7c1b3), //70%
-    700: const Color(0xffcfd6cc), //80%
-    800: const Color(0xffe7eae6), //90%
-    900: const Color(0xffffffff), //100%
-  },
-);
+
 
 
 

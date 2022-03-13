@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class BackgroundPainter extends CustomPainter {
@@ -5,12 +7,14 @@ class BackgroundPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const bgColor = Color.fromARGB(255, 11, 185, 8);
     const fgColor = Color.fromARGB(255, 60, 199, 56);
+    final Size physicalSize = Size(window.physicalSize.width, window.physicalSize.height);
+
     (() {
       // 绘制纯色背景
       final rect = Rect.fromCenter(
         center: Offset.zero,
-        width: size.width * 2,
-        height: size.height * 2,
+        width: physicalSize.width,
+        height: physicalSize.height,
       );
       var paint = Paint()
         ..isAntiAlias = true
@@ -19,19 +23,19 @@ class BackgroundPainter extends CustomPainter {
       canvas.drawRect(rect, paint);
     })();
     (() {
-      // TODO: 绘制宽斜线
+      // 绘制宽斜线
       Path path = Path();
-      double distance = 20;
-      double strokeWidth = 7;
-      for (int i = 0; i < size.width / distance * 4; i++) {
+      double distance = 20;  // 条纹中心间距
+      double strokeWidth = 7;  // 条纹宽度
+      for (int i = 0; i < physicalSize.width / distance * 2; i++) {
         path.relativeMoveTo(-distance * i, 0);
-        path.relativeMoveTo(size.width, -size.width);
-        path.relativeLineTo(-size.width * 4, size.width * 4);
+        path.relativeMoveTo(physicalSize.width, -physicalSize.width);
+        path.relativeLineTo(-physicalSize.width * 2, physicalSize.width * 2);
         path.moveTo(0, 0);
 
         path.relativeMoveTo(distance * i, 0);
-        path.relativeMoveTo(size.width, -size.width);
-        path.relativeLineTo(-size.width * 4, size.width * 4);
+        path.relativeMoveTo(physicalSize.width, -physicalSize.width);
+        path.relativeLineTo(-physicalSize.width * 2, physicalSize.width * 2);
         path.moveTo(0, 0);
       }
 
@@ -46,6 +50,6 @@ class BackgroundPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+    return false;  // 任何情况下都不需要重绘
   }
 }

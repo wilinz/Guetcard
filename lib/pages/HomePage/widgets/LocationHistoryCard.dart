@@ -4,6 +4,7 @@ import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
 import '../../../Const.dart';
 
+/// 行程卡卡片
 class LocationHistoryCard extends StatelessWidget {
   const LocationHistoryCard({Key? key}) : super(key: key);
 

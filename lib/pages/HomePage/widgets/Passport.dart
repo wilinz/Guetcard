@@ -13,6 +13,7 @@ class Passport extends StatelessWidget {
             // border: Border.symmetric(
             //   vertical: BorderSide.none,
             //   horizontal: BorderSide(
+            //     // 用上下 border 充当分割线
             //     color: Color.fromARGB(255, 240, 240, 240),
             //     width: 0.7,
             //   ),

@@ -114,7 +114,6 @@ class CheckingUpdate {
     )
         .then((value) async {
       Map<String, dynamic> map = value.data;
-      print(map);
       String remoteVersion =
           map["tag_name"].replaceAll("v", "").replaceAll(".", "");
       if (int.parse(remoteVersion) >

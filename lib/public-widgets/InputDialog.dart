@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// 在SimpleDialog上封装的一个简单的输入对话框
