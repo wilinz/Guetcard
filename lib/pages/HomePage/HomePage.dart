@@ -244,8 +244,8 @@ class _HomeContentState extends State<HomeContent> {
                   SizedBox(height: 15),
                   AntiScamCard(), // 反诈中心卡片
                   SizedBox(height: 15),
-                  QrHealthCard(),  // 健康码卡片
-                  SizedBox(height: 15),
+                  // QrHealthCard(),  // 健康码卡片
+                  // SizedBox(height: 15),
                   Passport(),  // 底部临时通行证卡片
                   SizedBox(height: 15),
                 ],

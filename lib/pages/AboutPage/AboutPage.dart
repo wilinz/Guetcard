@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:guet_card/public-widgets/CheckingUpdate.dart';
 
-const String VERSION = "v1.5.1";
+const String VERSION = "v1.5.2";
 
 /// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {
