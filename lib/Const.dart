@@ -8,7 +8,7 @@ class Const {
     "showUseGuideImg": "https://s1.ax1x.com/2022/03/12/bTN526.jpg",
     "jinjiling": "https://s1.ax1x.com/2022/03/07/b6nveP.png",
     "huajiang": "https://s1.ax1x.com/2022/03/22/qMEF3R.png",
-    "houjie": "https://s1.ax1x.com/2022/03/22/qMEiC9.png",
+    "houjie": "https://s1.ax1x.com/2022/03/22/qMWggK.png",
     "dongqu": "https://s1.ax1x.com/2022/03/07/b6uCWQ.png",
     "defaultAvatar": "https://s4.ax1x.com/2021/12/07/ogro5R.png",
     "doneInjection": "https://s4.ax1x.com/2021/12/07/ogrH8x.png",
