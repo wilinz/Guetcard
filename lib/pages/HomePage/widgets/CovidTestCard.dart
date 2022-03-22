@@ -19,7 +19,7 @@ class CovidTestCard extends StatelessWidget {
         ),
         width: width,
         height: width,
-        padding: EdgeInsets.only(left: 12, right: 12, top: 15),
+        padding: EdgeInsets.only(left: 12, right: 12, top: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -27,7 +27,8 @@ class CovidTestCard extends StatelessWidget {
               "核酸检测 >",
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
+                fontFamily: "PingFangSC-Regular",
               ),
             ),
             Center(
@@ -50,10 +51,16 @@ class CovidTestCard extends StatelessWidget {
                     "近48小时无核酸记录",
                     style: TextStyle(
                       color: Colors.grey,
+                      fontFamily: "PingFangSC-Regular",
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
-                      "近4天未检测"
+                    "近4天未检测",
+                    style: TextStyle(
+                      fontFamily: "PingFangSC-Regular",
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),

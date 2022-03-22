@@ -7,12 +7,13 @@ class EntryPermit extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Text(
-        "临时通行证",
+        "桂电学生临时通行证",
         maxLines: 1,
         style: TextStyle(
-          fontFamily: "PingFangSC-Heavy",
-          color: Color(0xFF007f00),
-          fontSize: 20,
+          fontFamily: "PingFangSC-Regular",
+          color: Color(0xff0cbb0a),
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

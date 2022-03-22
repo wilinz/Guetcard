@@ -19,7 +19,7 @@ class LocationHistoryCard extends StatelessWidget {
         ),
         width: width,
         height: width,
-        padding: EdgeInsets.only(left: 12, right: 12, top: 15),
+        padding: EdgeInsets.only(left: 12, right: 12, top: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -27,7 +27,8 @@ class LocationHistoryCard extends StatelessWidget {
               "行程记录 >",
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
+                fontFamily: "PingFangSC-Regular",
               ),
             ),
             Center(
@@ -47,13 +48,19 @@ class LocationHistoryCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    "今日未核验",
+                    "未核验行程卡",
                     style: TextStyle(
                       color: Colors.grey,
+                      fontFamily: "PingFangSC-Regular",
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
-                      "1秒前"
+                    "近4天未核验",
+                    style: TextStyle(
+                      fontFamily: "PingFangSC-Regular",
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),

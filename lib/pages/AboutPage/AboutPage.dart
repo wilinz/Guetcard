@@ -96,7 +96,8 @@ class AboutPage extends StatelessWidget {
             fontFamily: "PingFangSC",
           ),
           strong: Theme.of(context).textTheme.bodyText1!.copyWith(
-            fontFamily: "PingFangSC-Bold",
+            fontFamily: "PingFangSC-Regular",
+            fontWeight: FontWeight.bold,
           ),
           h1: Theme.of(context).textTheme.headline1!.copyWith(
             fontFamily: "PingFangSC-Heavy",

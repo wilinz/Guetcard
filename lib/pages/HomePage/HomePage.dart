@@ -206,7 +206,7 @@ class _HomeContentState extends State<HomeContent> {
             AppTitle(),
             TopRightButton(),
             Container(
-              margin: EdgeInsets.fromLTRB(15, 120, 15, 0),
+              margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
               alignment: Alignment.bottomCenter,
               child: ListView(
                 padding: EdgeInsets.zero, // 忽略 SafeArea
@@ -255,7 +255,7 @@ class _HomeContentState extends State<HomeContent> {
             ),
             Container(
               // 让时钟覆盖于其他层上方
-              margin: EdgeInsets.fromLTRB(15, 120, 15, 0),
+              margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
               alignment: Alignment.topCenter,
               child: Clock(),
             ),

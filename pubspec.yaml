@@ -91,9 +91,6 @@ flutter:
     - family: PingFangSC
       fonts:
         - asset: assets/fonts/PingFangSC-Regular.subset.ttf
-    - family: PingFangSC-Bold
-      fonts:
-        - asset: assets/fonts/PingFangSC-Bold.subset.ttf
     - family: PingFangSC-Heavy
       fonts:
         - asset: assets/fonts/PingFangSC-Heavy.subset.ttf

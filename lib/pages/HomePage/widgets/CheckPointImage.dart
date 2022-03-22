@@ -15,8 +15,8 @@ class CheckPointImageView extends StatefulWidget {
 
 class _CheckPointImageViewState extends State<CheckPointImageView> {
   final List<String> checkPointImgs = [
-    kIsWeb ? Const.networkImages["houjie"]! : Const.assetImages["houjie"]!,
     kIsWeb ? Const.networkImages["huajiang"]! : Const.assetImages["huajiang"]!,
+    kIsWeb ? Const.networkImages["houjie"]! : Const.assetImages["houjie"]!,
     kIsWeb ? Const.networkImages["jinjiling"]! : Const.assetImages["jinjiling"]!,
     kIsWeb ? Const.networkImages["dongqu"]! : Const.assetImages["dongqu"]!,
   ];

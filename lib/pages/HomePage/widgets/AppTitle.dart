@@ -11,7 +11,11 @@ class AppTitle extends StatelessWidget {
         padding: EdgeInsets.only(top: 35),
         child: Text(
           "桂电畅行证",
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w300,
+          ),
         ),
       ),
     );
