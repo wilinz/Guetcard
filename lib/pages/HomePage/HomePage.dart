@@ -10,22 +10,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../Routes.dart';
 import '../../main.dart';
 import '../../Const.dart';
+import '../../public-classes/WebJSMethods.dart';
+import '../../public-widgets/CheckingUpdate.dart';
+import '../../public-widgets/IntroImage.dart';
+import '../../public-widgets/BlackCornerRadius.dart';
 import '../../pages/HomePage/widgets/AntiScamCard.dart';
 import '../../pages/HomePage/widgets/BottomBar.dart';
 import '../../pages/HomePage/widgets/CovidTestCard.dart';
 import '../../pages/HomePage/widgets/LocationHistoryCard.dart';
 import '../../pages/HomePage/widgets/Passport.dart';
-import '../../CustomPainters/BackgroundPainter.dart';
-import '../../public-classes/WebJSMethods.dart';
-import '../../public-widgets/CheckingUpdate.dart';
-import '../../public-widgets/IntroImage.dart';
 import '../../pages/HomePage/widgets/Avatar.dart';
 import '../../pages/HomePage/widgets/CheckPointImage.dart';
 import '../../pages/HomePage/widgets/Clock.dart';
 import '../../pages/HomePage/widgets/QrHealthCard.dart';
 import '../../pages/HomePage/widgets/Name.dart';
 import '../../pages/HomePage/widgets/TopRightButton.dart';
-import '../../public-widgets/BlackCornerRadius.dart';
+import '../../pages/HomePage/widgets/EntryPermit.dart';
+import '../../pages/HomePage/widgets/AppTitle.dart';
+import '../../pages/HomePage/widgets/BackgroundStripe.dart';
+
+
+
 
 /// app的根组件
 class HomePage extends StatelessWidget {
@@ -67,7 +72,7 @@ class _HomeContentState extends State<HomeContent> {
       Const.networkImages["addToHomepageImage"]!;
   final String _showUseGuideImgUrl = kIsWeb
       ? Const.networkImages["showUseGuideImg"]!
-      : "assets/images/Tutorial.jpg";
+      : Const.assetImages["showUseGuideImg"]!;
 
   Future<void> _initPref() async {
     _pref = await SharedPreferences.getInstance();
@@ -196,13 +201,9 @@ class _HomeContentState extends State<HomeContent> {
         value: SystemUiOverlayStyle.light,
         child: Stack(
           children: [
-            CustomPaint(
-              size: MediaQuery.of(context).size,
-              painter: BackgroundPainter(),
-              willChange: false,
-              isComplex: true,
-            ),
+            BackgroundStripe(),
             CheckPointImageView(),
+            AppTitle(),
             TopRightButton(),
             Container(
               margin: EdgeInsets.fromLTRB(15, 120, 15, 0),
@@ -222,7 +223,8 @@ class _HomeContentState extends State<HomeContent> {
                     child: Column(
                       children: [
                         // Clock(),
-                        SizedBox(height: 90),
+                        SizedBox(height: 50),
+                        EntryPermit(),
                         Avatar(),
                         Name(),
                       ],

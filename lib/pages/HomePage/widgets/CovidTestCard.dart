@@ -37,8 +37,8 @@ class CovidTestCard extends StatelessWidget {
                   child: Builder(
                     builder: (BuildContext context) {
                       return kIsWeb
-                          ? WebImageWithIndicator(imgURL: Const.networkImages["test-tube"])
-                          : Image.asset("assets/images/test-tube.png");
+                          ? WebImageWithIndicator(imgURL: Const.networkImages["test-tube"]!)
+                          : Image.asset(Const.assetImages["test-tube"]!);
                     },
                   ),
                 )

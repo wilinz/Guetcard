@@ -7,14 +7,28 @@ class Const {
     "addToHomepageImage": "https://s4.ax1x.com/2021/12/07/ogrXrD.png",
     "showUseGuideImg": "https://s1.ax1x.com/2022/03/12/bTN526.jpg",
     "jinjiling": "https://s1.ax1x.com/2022/03/07/b6nveP.png",
-    "huajiang": "https://s4.ax1x.com/2021/12/07/ogrIa9.jpg",
-    "houjie": "https://s4.ax1x.com/2021/12/07/ogr7P1.jpg",
+    "huajiang": "https://s1.ax1x.com/2022/03/22/qMEF3R.png",
+    "houjie": "https://s1.ax1x.com/2022/03/22/qMEiC9.png",
+    "dongqu": "https://s1.ax1x.com/2022/03/07/b6uCWQ.png",
     "defaultAvatar": "https://s4.ax1x.com/2021/12/07/ogro5R.png",
     "doneInjection": "https://s4.ax1x.com/2021/12/07/ogrH8x.png",
     "topRightIcon": "https://s4.ax1x.com/2021/12/07/ogrqxK.png",
-    "dongqu": "https://s1.ax1x.com/2022/03/07/b6uCWQ.png",
     "test-tube": "https://s1.ax1x.com/2022/03/08/bguiyd.png",
     "location-history": "https://s1.ax1x.com/2022/03/08/bgBmtO.png",
+  };
+
+  static const assetImages = {
+    "goldenEdge": "assets/images/GoldenEdge.png",
+    "showUseGuideImg": "assets/images/Tutorial.jpg",
+    "jinjiling": "assets/images/jinjiling.png",
+    "huajiang": "assets/images/huajiang.png",
+    "houjie": "assets/images/houjie.png",
+    "dongqu": "assets/images/dongqu.png",
+    "defaultAvatar": "assets/images/DefaultAvatar.png",
+    "doneInjection": "assets/images/DoneInjection.png",
+    "topRightIcon": "assets/images/TopRightIcon.png",
+    "test-tube": "assets/images/test-tube.png",
+    "location-history": "assets/images/location-history.png",
   };
 
   static const String avatarListUrl = kIsWeb

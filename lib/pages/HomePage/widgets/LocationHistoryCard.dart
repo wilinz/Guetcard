@@ -37,8 +37,8 @@ class LocationHistoryCard extends StatelessWidget {
                   child: Builder(
                     builder: (BuildContext context) {
                       return kIsWeb
-                          ? WebImageWithIndicator(imgURL: Const.networkImages["location-history"])
-                          : Image.asset("assets/images/location-history.png");
+                          ? WebImageWithIndicator(imgURL: Const.networkImages["location-history"]!)
+                          : Image.asset(Const.assetImages["location-history"]!);
                     },
                   ),
                 )

@@ -23,7 +23,7 @@ class Avatar extends StatefulWidget {
 class _AvatarState extends State<Avatar> {
   final String _defaultAvatar = kIsWeb
       ? Const.networkImages['defaultAvatar']!
-      : "assets/images/DefaultAvatar.png";
+      : Const.assetImages['defaultAvatar']!;
   late String _avatarPath;
   final _width = 90.0;
   late Image _img;

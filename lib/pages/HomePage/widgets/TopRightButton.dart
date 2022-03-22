@@ -27,7 +27,7 @@ class TopRightButton extends StatelessWidget {
               );
             } else {
               return Image.asset(
-                "assets/images/TopRightIcon.png",
+                Const.assetImages["topRightIcon"]!,
                 height: _height,
               );
             }

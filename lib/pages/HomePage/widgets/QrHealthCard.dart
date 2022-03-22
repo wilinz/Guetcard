@@ -29,7 +29,7 @@ class QrHealthCard extends StatelessWidget {
         width: constraints.maxWidth * qrCodeScale,
       )
           : Image.asset(
-        "assets/images/GoldenEdge.png",
+        Const.assetImages["goldenEdge"]!,
         width: constraints.maxWidth * qrCodeScale,
       );
       var doneInjection = kIsWeb
@@ -39,7 +39,7 @@ class QrHealthCard extends StatelessWidget {
         width: constraints.maxWidth * 0.8,
       )
           : Image.asset(
-        "assets/images/DoneInjection.png",
+        Const.assetImages["doneInjection"]!,
         width: constraints.maxWidth * 0.8,
       );
       return Container(

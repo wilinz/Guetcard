@@ -39,17 +39,17 @@ class _ClockState extends State<Clock> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
+      height: 50,
+      width: MediaQuery.of(context).size.width,
+      alignment: Alignment.bottomCenter,
       color: Colors.white,
-      child: Center(
-        child: Text(
+      child: Text(
           _time,
           style: TextStyle(
             fontFamily: "PingFangSC-Heavy",
             fontSize: 27,
             color: Color(0xff0cbb0a),
           ),
-        ),
       ),
     );
   }

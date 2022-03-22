@@ -15,10 +15,10 @@ class CheckPointImageView extends StatefulWidget {
 
 class _CheckPointImageViewState extends State<CheckPointImageView> {
   final List<String> checkPointImgs = [
-    kIsWeb ? Const.networkImages["houjie"]! : "assets/images/houjie.jpg",
-    kIsWeb ? Const.networkImages["huajiang"]! : "assets/images/huajiang.jpg",
-    kIsWeb ? Const.networkImages["jinjiling"]! : "assets/images/jinjiling.png",
-    kIsWeb ? Const.networkImages["dongqu"]! : "assets/images/dongqu.png",
+    kIsWeb ? Const.networkImages["houjie"]! : Const.assetImages["houjie"]!,
+    kIsWeb ? Const.networkImages["huajiang"]! : Const.assetImages["huajiang"]!,
+    kIsWeb ? Const.networkImages["jinjiling"]! : Const.assetImages["jinjiling"]!,
+    kIsWeb ? Const.networkImages["dongqu"]! : Const.assetImages["dongqu"]!,
   ];
 
   @override
