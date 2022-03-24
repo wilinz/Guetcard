@@ -29,9 +29,6 @@ import '../../pages/HomePage/widgets/EntryPermit.dart';
 import '../../pages/HomePage/widgets/AppTitle.dart';
 import '../../pages/HomePage/widgets/BackgroundStripe.dart';
 
-
-
-
 /// app的根组件
 class HomePage extends StatelessWidget {
   @override
@@ -50,7 +47,7 @@ class HomePage extends StatelessWidget {
           ),
           primarySwatch: Const.Black,
           brightness: Brightness.light,
-          platform: TargetPlatform.iOS,  // 设定目标平台为 iOS 以启用右滑返回手势
+          platform: TargetPlatform.iOS, // 设定目标平台为 iOS 以启用右滑返回手势
         ),
       ),
     );
@@ -157,7 +154,10 @@ class _HomeContentState extends State<HomeContent> {
     this
         ._initPref()
         .then((value) => this._showGuide(context))
-        .then((value) => this._showAnnouncement(text: "", enabled: false));
+        .then((value) => this._showAnnouncement(
+              text: "项目无限期停止更新，同学们不要为了出校门而做出铤而走险的事情，积极配合疫情防控工作，保持健康！",
+              enabled: true,
+            ));
 
     // addPostFrameCallback 是StatefulWidget 渲染结束的回调，只会被调用一次，
     // 之后StatefulWidget 需要刷新UI 也不会被调用
@@ -206,7 +206,8 @@ class _HomeContentState extends State<HomeContent> {
             AppTitle(),
             TopRightButton(),
             Container(
-              margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
+              margin: EdgeInsets.fromLTRB(
+                  15, MediaQuery.of(context).size.width * 0.28, 15, 0),
               alignment: Alignment.bottomCenter,
               child: ListView(
                 padding: EdgeInsets.zero, // 忽略 SafeArea
@@ -235,11 +236,11 @@ class _HomeContentState extends State<HomeContent> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Expanded(
-                        child: CovidTestCard(),  // 核酸检测卡片
+                        child: CovidTestCard(), // 核酸检测卡片
                       ),
                       SizedBox(width: 15),
                       Expanded(
-                        child: LocationHistoryCard(),  // 行程卡卡片
+                        child: LocationHistoryCard(), // 行程卡卡片
                       ),
                     ],
                   ),
@@ -248,18 +249,19 @@ class _HomeContentState extends State<HomeContent> {
                   SizedBox(height: 15),
                   // QrHealthCard(),  // 健康码卡片
                   // SizedBox(height: 15),
-                  Passport(),  // 底部临时通行证卡片
+                  Passport(), // 底部临时通行证卡片
                   SizedBox(height: 15),
                 ],
               ),
             ),
             Container(
               // 让时钟覆盖于其他层上方
-              margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
+              margin: EdgeInsets.fromLTRB(
+                  15, MediaQuery.of(context).size.width * 0.28, 15, 0),
               alignment: Alignment.topCenter,
               child: Clock(),
             ),
-            BlackCornerRadius(),  // iPhone网页版上方的黑色圆角，非网页不生效
+            BlackCornerRadius(), // iPhone网页版上方的黑色圆角，非网页不生效
           ],
         ),
       ),

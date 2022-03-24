@@ -13,9 +13,6 @@ import 'public-classes/WebJSMethods.dart';
 List<String> avatarList = [];
 
 
-
-
-
 void printPref() async {
   const currentMode =
       kDebugMode ? "debug" : (kProfileMode ? "profile" : "release");
