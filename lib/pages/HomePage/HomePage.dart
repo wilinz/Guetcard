@@ -7,27 +7,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../Const.dart';
 import '../../Routes.dart';
 import '../../main.dart';
-import '../../Const.dart';
-import '../../public-classes/WebJSMethods.dart';
-import '../../public-widgets/CheckingUpdate.dart';
-import '../../public-widgets/IntroImage.dart';
-import '../../public-widgets/BlackCornerRadius.dart';
 import '../../pages/HomePage/widgets/AntiScamCard.dart';
-import '../../pages/HomePage/widgets/BottomBar.dart';
-import '../../pages/HomePage/widgets/CovidTestCard.dart';
-import '../../pages/HomePage/widgets/LocationHistoryCard.dart';
-import '../../pages/HomePage/widgets/Passport.dart';
-import '../../pages/HomePage/widgets/Avatar.dart';
-import '../../pages/HomePage/widgets/CheckPointImage.dart';
-import '../../pages/HomePage/widgets/Clock.dart';
-import '../../pages/HomePage/widgets/QrHealthCard.dart';
-import '../../pages/HomePage/widgets/Name.dart';
-import '../../pages/HomePage/widgets/TopRightButton.dart';
-import '../../pages/HomePage/widgets/EntryPermit.dart';
 import '../../pages/HomePage/widgets/AppTitle.dart';
 import '../../pages/HomePage/widgets/BackgroundStripe.dart';
+import '../../pages/HomePage/widgets/BottomBar.dart';
+import '../../pages/HomePage/widgets/CheckPointImage.dart';
+import '../../pages/HomePage/widgets/Clock.dart';
+import '../../pages/HomePage/widgets/EntryPermit.dart';
+import '../../pages/HomePage/widgets/Name.dart';
+import '../../pages/HomePage/widgets/Passport.dart';
+import '../../pages/HomePage/widgets/TopRightButton.dart';
+import '../../public-classes/WebJSMethods.dart';
+import '../../public-widgets/BlackCornerRadius.dart';
+import '../../public-widgets/CheckingUpdate.dart';
+import '../../public-widgets/IntroImage.dart';
 
 /// app的根组件
 class HomePage extends StatelessWidget {
@@ -65,11 +61,9 @@ class HomeContent extends StatefulWidget {
 class _HomeContentState extends State<HomeContent> {
   late SharedPreferences _pref;
 
-  final String _addToHomepageImageUrl =
-      Const.networkImages["addToHomepageImage"]!;
-  final String _showUseGuideImgUrl = kIsWeb
-      ? Const.networkImages["showUseGuideImg"]!
-      : Const.assetImages["showUseGuideImg"]!;
+  final String _addToHomepageImageUrl = Const.networkImages["addToHomepageImage"]!;
+  final String _showUseGuideImgUrl =
+      kIsWeb ? Const.networkImages["showUseGuideImg"]! : Const.assetImages["showUseGuideImg"]!;
 
   Future<void> _initPref() async {
     _pref = await SharedPreferences.getInstance();
@@ -151,13 +145,10 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
-    this
-        ._initPref()
-        .then((value) => this._showGuide(context))
-        .then((value) => this._showAnnouncement(
-              text: "项目无限期停止更新，同学们不要为了出校门而做出铤而走险的事情，积极配合疫情防控工作，保持健康！",
-              enabled: true,
-            ));
+    this._initPref().then((value) => this._showGuide(context)).then((value) => this._showAnnouncement(
+          text: "项目无限期停止更新，同学们不要为了出校门而做出铤而走险的事情，积极配合疫情防控工作，保持健康！",
+          enabled: true,
+        ));
 
     // addPostFrameCallback 是StatefulWidget 渲染结束的回调，只会被调用一次，
     // 之后StatefulWidget 需要刷新UI 也不会被调用
@@ -206,8 +197,7 @@ class _HomeContentState extends State<HomeContent> {
             AppTitle(),
             TopRightButton(),
             Container(
-              margin: EdgeInsets.fromLTRB(
-                  15, MediaQuery.of(context).size.width * 0.28, 15, 0),
+              margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
               alignment: Alignment.bottomCenter,
               child: ListView(
                 padding: EdgeInsets.zero, // 忽略 SafeArea
@@ -226,24 +216,24 @@ class _HomeContentState extends State<HomeContent> {
                         // Clock(),
                         SizedBox(height: 50),
                         EntryPermit(),
-                        Avatar(),
+                        // Avatar(),
                         Name(),
                       ],
                     ),
                   ),
-                  SizedBox(height: 15),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: CovidTestCard(), // 核酸检测卡片
-                      ),
-                      SizedBox(width: 15),
-                      Expanded(
-                        child: LocationHistoryCard(), // 行程卡卡片
-                      ),
-                    ],
-                  ),
+                  // SizedBox(height: 15),
+                  // Row(
+                  //   mainAxisSize: MainAxisSize.min,
+                  //   children: [
+                  //     Expanded(
+                  //       child: CovidTestCard(), // 核酸检测卡片
+                  //     ),
+                  //     SizedBox(width: 15),
+                  //     Expanded(
+                  //       child: LocationHistoryCard(), // 行程卡卡片
+                  //     ),
+                  //   ],
+                  // ),
                   SizedBox(height: 15),
                   AntiScamCard(), // 反诈中心卡片
                   SizedBox(height: 15),
@@ -256,8 +246,7 @@ class _HomeContentState extends State<HomeContent> {
             ),
             Container(
               // 让时钟覆盖于其他层上方
-              margin: EdgeInsets.fromLTRB(
-                  15, MediaQuery.of(context).size.width * 0.28, 15, 0),
+              margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
               alignment: Alignment.topCenter,
               child: Clock(),
             ),
