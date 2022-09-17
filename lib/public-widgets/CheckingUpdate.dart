@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_xupdate/flutter_xupdate.dart';
 import 'package:package_info/package_info.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class CheckingUpdate {
   Future<String> initPackageInfo() async {
@@ -74,8 +74,7 @@ class CheckingUpdate {
                                 fontSize: 18.0,
                               ),
                             ),
-                            onPressed: () =>
-                                Navigator.of(context).pop(), //关闭对话框
+                            onPressed: () => Navigator.of(context).pop(), //关闭对话框
                           ),
                           TextButton(
                             child: Text(
@@ -88,8 +87,8 @@ class CheckingUpdate {
                             ),
                             onPressed: () async {
                               Navigator.of(context).pop(); //关闭对话框
-                              await canLaunch(updateInfo["ipaUrl"])
-                                  ? await launch(updateInfo["ipaUrl"])
+                              await canLaunchUrlString(updateInfo["ipaUrl"])
+                                  ? await launchUrlString(updateInfo["ipaUrl"])
                                   : throw 'Could not launch ${updateInfo["ipaUrl"]}';
                             },
                           ),
@@ -114,10 +113,8 @@ class CheckingUpdate {
     )
         .then((value) async {
       Map<String, dynamic> map = value.data;
-      String remoteVersion =
-          map["tag_name"].replaceAll("v", "").replaceAll(".", "");
-      if (int.parse(remoteVersion) >
-          int.parse(currentVersion.replaceAll(".", ""))) {
+      String remoteVersion = map["tag_name"].replaceAll("v", "").replaceAll(".", "");
+      if (int.parse(remoteVersion) > int.parse(currentVersion.replaceAll(".", ""))) {
         String? apkUrl;
         for (var item in map["assets"]) {
           if (item["name"] != null && item["name"].endsWith(".apk")) {

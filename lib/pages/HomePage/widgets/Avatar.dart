@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -6,8 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:io';
-
 
 import '../../../Const.dart';
 import '../../../public-widgets/WebImageWithIndicator.dart';
@@ -21,14 +21,11 @@ class Avatar extends StatefulWidget {
 }
 
 class _AvatarState extends State<Avatar> {
-  final String _defaultAvatar = kIsWeb
-      ? Const.networkImages['defaultAvatar']!
-      : Const.assetImages['defaultAvatar']!;
+  final String _defaultAvatar = kIsWeb ? Const.networkImages['defaultAvatar']! : Const.assetImages['defaultAvatar']!;
   late String _avatarPath;
   final _width = 90.0;
-  late Image _img;
 
-  _AvatarState({Key? key}) {
+  _AvatarState() {
     _avatarPath = _defaultAvatar;
   }
 
@@ -106,21 +103,18 @@ class _AvatarState extends State<Avatar> {
             ),
           ),
           onTap: () async {
-            var imageFile = await _imgPicker.pickImage(
-                source: ImageSource.camera,
-                preferredCameraDevice: CameraDevice.front);
+            var imageFile =
+                await _imgPicker.pickImage(source: ImageSource.camera, preferredCameraDevice: CameraDevice.front);
             if (imageFile != null) {
               Navigator.pop(context);
               File _image = File(imageFile.path);
-              var result = await Navigator.of(context).pushNamed(
-                  "cropAvatarPage", arguments: _image);
+              var result = await Navigator.of(context).pushNamed("cropAvatarPage", arguments: _image);
               if (result != null) {
                 var docPath = await getApplicationDocumentsDirectory();
                 var pref = await SharedPreferences.getInstance();
                 var lastAvatar = pref.getString("userAvatar");
                 if (lastAvatar != null && !lastAvatar.startsWith("http")) {
-                  _deletePreviousAvatar(
-                      "${docPath.path}/${pref.getString("userAvatar")}");
+                  _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
                 }
                 String name = result as String;
                 if (mounted) {
@@ -150,15 +144,13 @@ class _AvatarState extends State<Avatar> {
             if (imageFile != null) {
               Navigator.pop(context);
               File _image = File(imageFile.path);
-              var result = await Navigator.of(context).pushNamed(
-                  "cropAvatarPage", arguments: _image);
+              var result = await Navigator.of(context).pushNamed("cropAvatarPage", arguments: _image);
               if (result != null) {
                 var docPath = await getApplicationDocumentsDirectory();
                 var pref = await SharedPreferences.getInstance();
                 var lastAvatar = pref.getString("userAvatar");
                 if (lastAvatar != null && !lastAvatar.startsWith("http")) {
-                  _deletePreviousAvatar(
-                      "${docPath.path}/${pref.getString("userAvatar")}");
+                  _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
                 }
                 String name = result as String;
                 if (mounted) {
@@ -202,12 +194,11 @@ class _AvatarState extends State<Avatar> {
               var name = "${Uuid().v4()}";
               var ext = url.toString().split(".").last;
               Dio().download(url, "${dir.path}/$name.$ext").then(
-                    (value) {
+                (value) {
                   if (value.statusCode == 200) {
                     ProgressHud.dismiss();
                     if (lastAvatar != null && !lastAvatar.startsWith("http")) {
-                      _deletePreviousAvatar(
-                          "${docPath.path}/${pref.getString("userAvatar")}");
+                      _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
                     }
                     if (mounted) {
                       setState(() {
@@ -240,8 +231,7 @@ class _AvatarState extends State<Avatar> {
         onTap: () async {
           Navigator.pop(context);
           Future<String> getAvatarUrl() async {
-            final result =
-            await Dio().get("https://api.vvhan.com/api/avatar?type=json");
+            final result = await Dio().get("https://api.vvhan.com/api/avatar?type=json");
             return result.data["avatar"];
           }
 
@@ -266,12 +256,11 @@ class _AvatarState extends State<Avatar> {
             var name = "${Uuid().v4()}";
             var ext = url.toString().split(".").last;
             Dio().download(url, "${dir.path}/$name.$ext").then(
-                  (value) {
+              (value) {
                 if (value.statusCode == 200) {
                   ProgressHud.dismiss();
                   if (lastAvatar != null && !lastAvatar.startsWith("http")) {
-                    _deletePreviousAvatar(
-                        "${docPath.path}/${pref.getString("userAvatar")}");
+                    _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
                   }
                   if (mounted) {
                     setState(() {

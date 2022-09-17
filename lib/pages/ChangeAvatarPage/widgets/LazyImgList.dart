@@ -62,7 +62,6 @@ class _LazyImgListState extends State<LazyImgList> {
 
   @override
   void dispose() {
-    dio.clear();
     dio.close(force: true);
     super.dispose();
   }
@@ -71,7 +70,6 @@ class _LazyImgListState extends State<LazyImgList> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final height = size.height;
     int imgPerRow = width ~/ 120;
     if (avatarList.length != 0) {
       return ListView.separated(

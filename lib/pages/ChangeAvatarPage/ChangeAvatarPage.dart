@@ -1,5 +1,4 @@
 import 'package:crop_image/crop_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:guet_card/pages/ChangeAvatarPage/widgets/LazyImgList.dart';
 
@@ -38,4 +37,3 @@ class ChangeAvatarPage extends StatelessWidget {
     );
   }
 }
-

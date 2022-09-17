@@ -1,12 +1,10 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:bmprogresshud/bmprogresshud.dart';
 import 'package:crop_image/crop_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -61,14 +59,12 @@ class _CropAvatarPageState extends State<CropAvatarPage> {
                 } else {
                   return;
                 }
-                ui.Image image =
-                    await controller.croppedBitmap(quality: FilterQuality.low);
+                ui.Image image = await controller.croppedBitmap(quality: FilterQuality.low);
                 var dir = await getApplicationDocumentsDirectory();
                 var name = "${Uuid().v4()}.png";
                 var path = '${dir.path}/$name';
                 File savedImage = File(path);
-                ByteData? imageData =
-                    await image.toByteData(format: ui.ImageByteFormat.png);
+                ByteData? imageData = await image.toByteData(format: ui.ImageByteFormat.png);
                 if (imageData == null) {
                   throw "imageData should not be null!";
                 }
@@ -96,8 +92,7 @@ class _CropAvatarPageState extends State<CropAvatarPage> {
             },
             backgroundColor: Colors.green,
           ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         ),
         onWillPop: () async {
           return isPopable;
