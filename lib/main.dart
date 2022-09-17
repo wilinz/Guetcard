@@ -7,15 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/HomePage/HomePage.dart';
 import 'public-classes/UsernameModel.dart';
 
-import 'public-classes/WebJSMethods.dart';
-
-
 List<String> avatarList = [];
 
-
 void printPref() async {
-  const currentMode =
-      kDebugMode ? "debug" : (kProfileMode ? "profile" : "release");
+  const currentMode = kDebugMode ? "debug" : (kProfileMode ? "profile" : "release");
   if (currentMode == "debug") {
     var pref = await SharedPreferences.getInstance();
     try {
@@ -23,8 +18,7 @@ void printPref() async {
       String? userAvatar = pref.getString("userAvatar");
       String? name = pref.getString("name");
       bool? skipGuide = pref.getBool("isSkipGuide");
-      debugPrint(
-          "userAvatar: $userAvatar\nname: $name\nisSkipGuide: $skipGuide");
+      debugPrint("userAvatar: $userAvatar\nname: $name\nisSkipGuide: $skipGuide");
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -32,14 +26,10 @@ void printPref() async {
 }
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => UsernameModel(""))
-      ],
-      child: HomePage(),
-    )
-  );
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider(create: (context) => UsernameModel(""))],
+    child: HomePage(),
+  ));
   printPref();
   // 设为仅竖屏模式
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -49,4 +39,3 @@ void main() {
     ),
   );
 }
-

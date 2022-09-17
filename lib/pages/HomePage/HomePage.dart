@@ -145,14 +145,16 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
-    this._initPref().then((value) => this._showGuide(context)).then((value) => this._showAnnouncement(
-          text: "项目无限期停止更新，同学们不要为了出校门而做出铤而走险的事情，积极配合疫情防控工作，保持健康！",
-          enabled: true,
-        ));
+    // this._initPref().then((value) => this._showGuide(context)).then(
+    //       (value) => this._showAnnouncement(
+    //         text: "项目无限期停止更新，同学们不要为了出校门而做出铤而走险的事情，积极配合疫情防控工作，保持健康！",
+    //         enabled: true,
+    //       ),
+    //     );
 
     // addPostFrameCallback 是StatefulWidget 渲染结束的回调，只会被调用一次，
     // 之后StatefulWidget 需要刷新UI 也不会被调用
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (kIsWeb) {
         Const.networkImages.forEach((key, value) {
           precacheImage(NetworkImage(value), context);

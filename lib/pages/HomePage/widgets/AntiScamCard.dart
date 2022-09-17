@@ -11,22 +11,22 @@ class AntiScamCard extends StatelessWidget {
         color: Color.fromARGB(255, 30, 64, 221),
         borderRadius: BorderRadius.circular(5),
       ),
-      padding: EdgeInsets.all(15),
+      padding: EdgeInsets.all(10),
       child: Column(
         children: [
           Text(
             "注册“金钟罩”、国家反诈中心",
             style: TextStyle(
               color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 19,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 5,),
           Text(
             "科技防诈让你远离诈骗侵害",
             style: TextStyle(
-                color: Colors.white,
+              color: Colors.white,
+              fontSize: 18,
             ),
           ),
         ],

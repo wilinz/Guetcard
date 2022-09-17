@@ -1,4 +1,5 @@
 buildscript {
+    android.jetifier.blacklist=bcprov-jdk15on
     ext.kotlin_version = '1.6.10'
     repositories {
         google()

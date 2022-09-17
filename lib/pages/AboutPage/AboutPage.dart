@@ -4,17 +4,19 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../public-widgets/CheckingUpdate.dart';
 import '../../Const.dart';
+import '../../public-widgets/CheckingUpdate.dart';
 
-const String VERSION = "v1.5.3";
+const String VERSION = "v1.5.4";
 
 /// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {
   AboutPage({Key? key}) : super(key: key);
   final String _md = '''
 # guet_card $VERSION
-一个使用 Flutter 重写的 [guet_card](https://gitee.com/guetcard/guetcard)，支持 Android、iOS、[网页端](https://guet-card.web.app)。此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
+一个使用 Flutter 重写的 [guet_card](https://gitee.com/guetcard/guetcard)，支持 Android、iOS、[网页端](https://guet-card.web.app)。
+
+此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
 
 ![](${Const.networkImages["showUseGuideImg"]!})
 
@@ -81,48 +83,48 @@ class AboutPage extends StatelessWidget {
         selectable: true,
         onTapLink: (String text, String? href, String title) async {
           if (href != null) {
-            await canLaunch(href)
-                ? await launch(href)
-                : throw "url_launch 无法打开 $href";
+            final uri = Uri.parse(href);
+            await canLaunchUrl(uri) ? await launchUrl(uri) : throw "url_launch 无法打开 $href";
           } else {
             throw "点击的链接 (text: $text, title: $title) 中不包含 URL";
           }
         },
         styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
           p: Theme.of(context).textTheme.bodyText1!.copyWith(
-            fontFamily: "PingFangSC",
-          ),
+                fontFamily: "PingFangSC",
+              ),
           a: Theme.of(context).textTheme.bodyText1!.copyWith(
-            fontFamily: "PingFangSC",
-          ),
+                fontFamily: "PingFangSC",
+                decoration: TextDecoration.underline,
+              ),
           strong: Theme.of(context).textTheme.bodyText1!.copyWith(
-            fontFamily: "PingFangSC-Regular",
-            fontWeight: FontWeight.bold,
-          ),
+                fontFamily: "PingFangSC-Regular",
+                fontWeight: FontWeight.bold,
+              ),
           h1: Theme.of(context).textTheme.headline1!.copyWith(
-            fontFamily: "PingFangSC-Heavy",
-            fontSize: 24,
-          ),
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 24,
+              ),
           h2: Theme.of(context).textTheme.headline2!.copyWith(
-            fontFamily: "PingFangSC-Heavy",
-            fontSize: 20,
-          ),
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 20,
+              ),
           h3: Theme.of(context).textTheme.headline3!.copyWith(
-            fontFamily: "PingFangSC-Heavy",
-            fontSize: 18,
-          ),
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 18,
+              ),
           h4: Theme.of(context).textTheme.headline4!.copyWith(
-            fontFamily: "PingFangSC-Heavy",
-            fontSize: 16,
-          ),
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 16,
+              ),
           h5: Theme.of(context).textTheme.headline5!.copyWith(
-            fontFamily: "PingFangSC-Heavy",
-            fontSize: 15,
-          ),
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 15,
+              ),
           h6: Theme.of(context).textTheme.headline6!.copyWith(
-            fontFamily: "PingFangSC-Heavy",
-            fontSize: 14,
-          ),
+                fontFamily: "PingFangSC-Heavy",
+                fontSize: 14,
+              ),
         ),
       ),
     );

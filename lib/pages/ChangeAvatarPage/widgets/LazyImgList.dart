@@ -27,7 +27,7 @@ class _LazyImgListState extends State<LazyImgList> {
       await Future.delayed(Duration(seconds: 1));
     }
     await dio.get(Const.avatarListUrl).then(
-          (value) {
+      (value) {
         if (avatarList.length == 0) {
           var list = value.toString().split('\n');
           for (String line in list) {
@@ -54,8 +54,8 @@ class _LazyImgListState extends State<LazyImgList> {
   void initState() {
     super.initState();
     if (avatarList.length <= 0) {
-      WidgetsBinding.instance?.addPostFrameCallback(
-            (timeStamp) => _loadAvatarList(),
+      WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) => _loadAvatarList(),
       );
     }
   }
@@ -87,11 +87,9 @@ class _LazyImgListState extends State<LazyImgList> {
                 width: imgWidth,
                 child: TextButton(
                     onPressed: () async {
-                      Navigator.of(context)
-                          .pop(avatarList[vindex * imgPerRow + hindex]);
+                      Navigator.of(context).pop(avatarList[vindex * imgPerRow + hindex]);
                     },
-                    child: WebImageWithIndicator(imgURL: avatarList[vindex * imgPerRow + hindex])
-                ),
+                    child: WebImageWithIndicator(imgURL: avatarList[vindex * imgPerRow + hindex])),
               );
             };
 
