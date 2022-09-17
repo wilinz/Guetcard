@@ -76,11 +76,7 @@
                   console.log('Installed new service worker.');
                   loadMainDartJs();
                   if (navigator.serviceWorker.controller) {
-                    // you have a better UI here, reloading is not a great user experince here.
-                    const confirmed = alert('新版本已准备好，请点击确定来刷新');
-                    if (confirmed == true) {
-                      window.location.reload();
-                    }
+                    location.reload(true);
                   }
                 }
               });

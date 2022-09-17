@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:guet_card/Const.dart';
+import 'package:guet_card/public-widgets/CheckingUpdate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../Const.dart';
-import '../../public-widgets/CheckingUpdate.dart';
 
 const String VERSION = "v1.5.4";
 

@@ -1,29 +1,24 @@
-import 'dart:async';
-
 import 'package:bmprogresshud/progresshud.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:guet_card/Const.dart';
+import 'package:guet_card/Routes.dart';
+import 'package:guet_card/pages/HomePage/widgets/AntiScamCard.dart';
+import 'package:guet_card/pages/HomePage/widgets/AppTitle.dart';
+import 'package:guet_card/pages/HomePage/widgets/BackgroundStripe.dart';
+import 'package:guet_card/pages/HomePage/widgets/BottomBar.dart';
+import 'package:guet_card/pages/HomePage/widgets/CheckPointImage.dart';
+import 'package:guet_card/pages/HomePage/widgets/Clock.dart';
+import 'package:guet_card/pages/HomePage/widgets/EntryPermit.dart';
+import 'package:guet_card/pages/HomePage/widgets/Name.dart';
+import 'package:guet_card/pages/HomePage/widgets/Passport.dart';
+import 'package:guet_card/pages/HomePage/widgets/TopRightButton.dart';
+import 'package:guet_card/public-classes/WebJSMethods.dart';
+import 'package:guet_card/public-widgets/BlackCornerRadius.dart';
+import 'package:guet_card/public-widgets/CheckingUpdate.dart';
+import 'package:guet_card/public-widgets/IntroImage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../Const.dart';
-import '../../Routes.dart';
-import '../../main.dart';
-import '../../pages/HomePage/widgets/AntiScamCard.dart';
-import '../../pages/HomePage/widgets/AppTitle.dart';
-import '../../pages/HomePage/widgets/BackgroundStripe.dart';
-import '../../pages/HomePage/widgets/BottomBar.dart';
-import '../../pages/HomePage/widgets/CheckPointImage.dart';
-import '../../pages/HomePage/widgets/Clock.dart';
-import '../../pages/HomePage/widgets/EntryPermit.dart';
-import '../../pages/HomePage/widgets/Name.dart';
-import '../../pages/HomePage/widgets/Passport.dart';
-import '../../pages/HomePage/widgets/TopRightButton.dart';
-import '../../public-classes/WebJSMethods.dart';
-import '../../public-widgets/BlackCornerRadius.dart';
-import '../../public-widgets/CheckingUpdate.dart';
-import '../../public-widgets/IntroImage.dart';
 
 /// app的根组件
 class HomePage extends StatelessWidget {
@@ -64,10 +59,6 @@ class _HomeContentState extends State<HomeContent> {
   final String _addToHomepageImageUrl = Const.networkImages["addToHomepageImage"]!;
   final String _showUseGuideImgUrl =
       kIsWeb ? Const.networkImages["showUseGuideImg"]! : Const.assetImages["showUseGuideImg"]!;
-
-  Future<void> _initPref() async {
-    _pref = await SharedPreferences.getInstance();
-  }
 
   void _showGuide(BuildContext context) {
     void _showAddToHomepageGuide(Function() callback) {
@@ -145,12 +136,10 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
-    // this._initPref().then((value) => this._showGuide(context)).then(
-    //       (value) => this._showAnnouncement(
-    //         text: "项目无限期停止更新，同学们不要为了出校门而做出铤而走险的事情，积极配合疫情防控工作，保持健康！",
-    //         enabled: true,
-    //       ),
-    //     );
+    SharedPreferences.getInstance().then((pref) {
+      _pref = pref;
+      this._showGuide(context);
+    });
 
     // addPostFrameCallback 是StatefulWidget 渲染结束的回调，只会被调用一次，
     // 之后StatefulWidget 需要刷新UI 也不会被调用
@@ -164,25 +153,25 @@ class _HomeContentState extends State<HomeContent> {
         _checkingUpdate.checkForUpdate(context);
       }
       // 启动一秒后开始预缓存头像列表和头像图片
-      Future.delayed(Duration(seconds: 1), () {
-        Dio().get(Const.avatarListUrl).then((value) {
-          if (avatarList.length == 0) {
-            var list = value.toString().split('\n');
-            for (String line in list) {
-              if (line.length > 0 && line.startsWith("http")) {
-                avatarList.add(line);
-              }
-            }
-            for (var img in avatarList.sublist(0, 20)) {
-              precacheImage(NetworkImage(img), context);
-            }
-          }
-        }).onError((error, stackTrace) {
-          debugPrint("头像列表下载失败:");
-          debugPrint("error: $error");
-          ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
-        });
-      });
+      // Future.delayed(Duration(seconds: 1), () {
+      //   Dio().get(Const.avatarListUrl).then((value) {
+      //     if (avatarList.length == 0) {
+      //       var list = value.toString().split('\n');
+      //       for (String line in list) {
+      //         if (line.length > 0 && line.startsWith("http")) {
+      //           avatarList.add(line);
+      //         }
+      //       }
+      //       for (var img in avatarList.sublist(0, 20)) {
+      //         precacheImage(NetworkImage(img), context);
+      //       }
+      //     }
+      //   }).onError((error, stackTrace) {
+      //     debugPrint("头像列表下载失败:");
+      //     debugPrint("error: $error");
+      //     ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
+      //   });
+      // });
     });
   }
 
@@ -206,13 +195,14 @@ class _HomeContentState extends State<HomeContent> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.zero,
-                          topRight: Radius.zero,
-                          bottomLeft: Radius.circular(5),
-                          bottomRight: Radius.circular(5),
-                        )),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.zero,
+                        topRight: Radius.zero,
+                        bottomLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
+                    ),
                     child: Column(
                       children: [
                         // Clock(),
