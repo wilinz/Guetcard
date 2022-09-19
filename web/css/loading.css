@@ -21,7 +21,7 @@ div.wait-loading {
 }
 
 .spinner > div {
-  background-color: #B908FF;
+  background-color: #0BB908FF;
   height: 100%;
   width: 6px;
   display: inline-block;
