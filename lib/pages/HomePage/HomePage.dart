@@ -6,6 +6,7 @@ import 'package:guet_card/Const.dart';
 import 'package:guet_card/Routes.dart';
 import 'package:guet_card/pages/HomePage/widgets/AntiScamCard.dart';
 import 'package:guet_card/pages/HomePage/widgets/AppTitle.dart';
+import 'package:guet_card/pages/HomePage/widgets/Avatar.dart';
 import 'package:guet_card/pages/HomePage/widgets/BackgroundStripe.dart';
 import 'package:guet_card/pages/HomePage/widgets/BottomBar.dart';
 import 'package:guet_card/pages/HomePage/widgets/CheckPointImage.dart';
@@ -208,7 +209,7 @@ class _HomeContentState extends State<HomeContent> {
                         // Clock(),
                         SizedBox(height: 50),
                         EntryPermit(),
-                        // Avatar(),
+                        Avatar(),
                         Name(),
                       ],
                     ),
