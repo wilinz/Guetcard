@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:guet_card/Const.dart';
-import 'package:guet_card/public-widgets/CheckingUpdate.dart';
+import 'package:guet_card/public-classes/CheckingUpdate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -52,8 +52,7 @@ class AboutPage extends StatelessWidget {
           padding: EdgeInsets.only(right: 10),
           child: TextButton(
             onPressed: () {
-              CheckingUpdate _checkingUpdate = CheckingUpdate();
-              _checkingUpdate.checkForUpdate(context);
+              CheckingUpdate.checkForUpdate(context);
             },
             child: Text(
               "检查更新",

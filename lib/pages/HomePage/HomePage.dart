@@ -15,9 +15,9 @@ import 'package:guet_card/pages/HomePage/widgets/EntryPermit.dart';
 import 'package:guet_card/pages/HomePage/widgets/Name.dart';
 import 'package:guet_card/pages/HomePage/widgets/Passport.dart';
 import 'package:guet_card/pages/HomePage/widgets/TopRightButton.dart';
+import 'package:guet_card/public-classes/CheckingUpdate.dart';
 import 'package:guet_card/public-classes/WebJSMethods.dart';
 import 'package:guet_card/public-widgets/BlackCornerRadius.dart';
-import 'package:guet_card/public-widgets/CheckingUpdate.dart';
 import 'package:guet_card/public-widgets/IntroImage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          primarySwatch: Const.Black,
+          primarySwatch: Const.black,
           brightness: Brightness.light,
           platform: TargetPlatform.iOS, // 设定目标平台为 iOS 以启用右滑返回手势
         ),
@@ -150,8 +150,7 @@ class _HomeContentState extends State<HomeContent> {
           precacheImage(NetworkImage(value), context);
         });
       } else {
-        CheckingUpdate _checkingUpdate = CheckingUpdate();
-        _checkingUpdate.checkForUpdate(context);
+        CheckingUpdate.checkForUpdate(context);
       }
       // 启动一秒后开始预缓存头像列表和头像图片
       // Future.delayed(Duration(seconds: 1), () {
@@ -178,76 +177,89 @@ class _HomeContentState extends State<HomeContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        // 强制将系统状态栏设置为亮色
-        value: SystemUiOverlayStyle.light,
-        child: Stack(
-          children: [
-            BackgroundStripe(),
-            CheckPointImageView(),
-            AppTitle(),
-            TopRightButton(),
-            Container(
-              margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
-              alignment: Alignment.bottomCenter,
-              child: ListView(
-                padding: EdgeInsets.zero, // 忽略 SafeArea
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.zero,
-                        topRight: Radius.zero,
-                        bottomLeft: Radius.circular(5),
-                        bottomRight: Radius.circular(5),
+    return Theme(
+      data: ThemeData(
+        snackBarTheme: SnackBarThemeData(
+          contentTextStyle: TextStyle(
+            fontFamily: "PingFangSC",
+            color: Colors.white,
+          ),
+        ),
+        primarySwatch: Colors.green,
+        brightness: Brightness.light,
+        platform: TargetPlatform.iOS, // 设定目标平台为 iOS 以启用右滑返回手势
+      ),
+      child: Scaffold(
+        body: AnnotatedRegion<SystemUiOverlayStyle>(
+          // 强制将系统状态栏设置为亮色
+          value: SystemUiOverlayStyle.light,
+          child: Stack(
+            children: [
+              BackgroundStripe(),
+              CheckPointImageView(),
+              AppTitle(),
+              TopRightButton(),
+              Container(
+                margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
+                alignment: Alignment.bottomCenter,
+                child: ListView(
+                  padding: EdgeInsets.zero, // 忽略 SafeArea
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.zero,
+                          topRight: Radius.zero,
+                          bottomLeft: Radius.circular(5),
+                          bottomRight: Radius.circular(5),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          // Clock(),
+                          SizedBox(height: 50),
+                          EntryPermit(),
+                          Avatar(),
+                          Name(),
+                        ],
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        // Clock(),
-                        SizedBox(height: 50),
-                        EntryPermit(),
-                        Avatar(),
-                        Name(),
-                      ],
-                    ),
-                  ),
-                  // SizedBox(height: 15),
-                  // Row(
-                  //   mainAxisSize: MainAxisSize.min,
-                  //   children: [
-                  //     Expanded(
-                  //       child: CovidTestCard(), // 核酸检测卡片
-                  //     ),
-                  //     SizedBox(width: 15),
-                  //     Expanded(
-                  //       child: LocationHistoryCard(), // 行程卡卡片
-                  //     ),
-                  //   ],
-                  // ),
-                  SizedBox(height: 15),
-                  AntiScamCard(), // 反诈中心卡片
-                  SizedBox(height: 15),
-                  // QrHealthCard(),  // 健康码卡片
-                  // SizedBox(height: 15),
-                  Passport(), // 底部临时通行证卡片
-                  SizedBox(height: 15),
-                ],
+                    // SizedBox(height: 15),
+                    // Row(
+                    //   mainAxisSize: MainAxisSize.min,
+                    //   children: [
+                    //     Expanded(
+                    //       child: CovidTestCard(), // 核酸检测卡片
+                    //     ),
+                    //     SizedBox(width: 15),
+                    //     Expanded(
+                    //       child: LocationHistoryCard(), // 行程卡卡片
+                    //     ),
+                    //   ],
+                    // ),
+                    SizedBox(height: 15),
+                    AntiScamCard(), // 反诈中心卡片
+                    SizedBox(height: 15),
+                    // QrHealthCard(),  // 健康码卡片
+                    // SizedBox(height: 15),
+                    Passport(), // 底部临时通行证卡片
+                    SizedBox(height: 15),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              // 让时钟覆盖于其他层上方
-              margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
-              alignment: Alignment.topCenter,
-              child: Clock(),
-            ),
-            BlackCornerRadius(), // iPhone网页版上方的黑色圆角，非网页不生效
-          ],
+              Container(
+                // 让时钟覆盖于其他层上方
+                margin: EdgeInsets.fromLTRB(15, MediaQuery.of(context).size.width * 0.28, 15, 0),
+                alignment: Alignment.topCenter,
+                child: Clock(),
+              ),
+              BlackCornerRadius(), // iPhone网页版上方的黑色圆角，非网页不生效
+            ],
+          ),
         ),
+        bottomNavigationBar: BottomBar(),
       ),
-      bottomNavigationBar: BottomBar(),
     );
   }
 }
