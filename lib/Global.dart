@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class Const {
+class Global {
   static const networkImages = {
     "goldenEdge": "https://s4.ax1x.com/2021/12/07/ogrOKO.png",
     "addToHomepageImage": "https://s4.ax1x.com/2021/12/07/ogrXrD.png",
@@ -46,4 +47,6 @@ class Const {
     800: const Color(0xff000000), //90%
     900: const Color(0xff000000), //100%
   });
+
+  static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 }

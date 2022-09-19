@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../Const.dart';
+import '../../../Global.dart';
 import '../../../main.dart';
 import '../../../public-widgets/WebImageWithIndicator.dart';
 
@@ -26,7 +26,7 @@ class _LazyImgListState extends State<LazyImgList> {
     if (kDebugMode) {
       await Future.delayed(Duration(seconds: 1));
     }
-    await dio.get(Const.avatarListUrl).then(
+    await dio.get(Global.avatarListUrl).then(
       (value) {
         if (avatarList.length == 0) {
           var list = value.toString().split('\n');

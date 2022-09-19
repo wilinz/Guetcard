@@ -3,13 +3,11 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:transparent_image/transparent_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:transparent_image/transparent_image.dart';
 
-
-import '../../../Const.dart';
+import '../../../Global.dart';
 import '../../../public-classes/UsernameModel.dart';
-
 
 /// 健康码卡片视图
 class QrHealthCard extends StatelessWidget {
@@ -19,29 +17,28 @@ class QrHealthCard extends StatelessWidget {
       int next(int min, int max) => min + Random().nextInt(max - min);
       final int randNum1 = next(203, 582);
       final int randNum2 = next(1365, 9658);
-      final String time =
-      DateTime.now().toString().split(":").sublist(0, 2).join(":");
+      final String time = DateTime.now().toString().split(":").sublist(0, 2).join(":");
       final double qrCodeScale = 0.5;
       var goldenEdge = kIsWeb
           ? FadeInImage.memoryNetwork(
-        placeholder: kTransparentImage,
-        image: Const.networkImages["goldenEdge"]!,
-        width: constraints.maxWidth * qrCodeScale,
-      )
+              placeholder: kTransparentImage,
+              image: Global.networkImages["goldenEdge"]!,
+              width: constraints.maxWidth * qrCodeScale,
+            )
           : Image.asset(
-        Const.assetImages["goldenEdge"]!,
-        width: constraints.maxWidth * qrCodeScale,
-      );
+              Global.assetImages["goldenEdge"]!,
+              width: constraints.maxWidth * qrCodeScale,
+            );
       var doneInjection = kIsWeb
           ? FadeInImage.memoryNetwork(
-        placeholder: kTransparentImage,
-        image: Const.networkImages["doneInjection"]!,
-        width: constraints.maxWidth * 0.8,
-      )
+              placeholder: kTransparentImage,
+              image: Global.networkImages["doneInjection"]!,
+              width: constraints.maxWidth * 0.8,
+            )
           : Image.asset(
-        Const.assetImages["doneInjection"]!,
-        width: constraints.maxWidth * 0.8,
-      );
+              Global.assetImages["doneInjection"]!,
+              width: constraints.maxWidth * 0.8,
+            );
       return Container(
         // color: Colors.white,
         decoration: BoxDecoration(
@@ -51,7 +48,9 @@ class QrHealthCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 30,),
+            SizedBox(
+              height: 30,
+            ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -100,7 +99,8 @@ class QrHealthCard extends StatelessWidget {
                       height: constraints.maxWidth * qrCodeScale,
                       alignment: Alignment.center,
                     ),
-                  ),],
+                  ),
+                ],
               ),
             ),
             Transform.translate(

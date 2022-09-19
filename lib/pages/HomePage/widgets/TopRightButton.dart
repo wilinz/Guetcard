@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../Const.dart';
+import '../../../Global.dart';
 
 /// 右上角图标
 class TopRightButton extends StatelessWidget {
@@ -14,7 +14,13 @@ class TopRightButton extends StatelessWidget {
     return SafeArea(
       child: Container(
         alignment: Alignment.topRight,
-        padding: EdgeInsets.only(top: kIsWeb ? 30 : safeAreaTopHeight > 40 ? 0 : 15, right: 15),
+        padding: EdgeInsets.only(
+            top: kIsWeb
+                ? 30
+                : safeAreaTopHeight > 40
+                    ? 0
+                    : 15,
+            right: 15),
         child: Container(
           height: _imgHeight + 9,
           child: OutlinedButton(
@@ -24,12 +30,12 @@ class TopRightButton extends StatelessWidget {
             child: Builder(builder: (context) {
               if (kIsWeb) {
                 return Image.network(
-                  Const.networkImages["topRightIcon"]!,
+                  Global.networkImages["topRightIcon"]!,
                   height: _imgHeight,
                 );
               } else {
                 return Image.asset(
-                  Const.assetImages["topRightIcon"]!,
+                  Global.assetImages["topRightIcon"]!,
                   height: _imgHeight,
                 );
               }

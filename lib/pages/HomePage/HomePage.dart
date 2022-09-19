@@ -2,7 +2,7 @@ import 'package:bmprogresshud/progresshud.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:guet_card/Const.dart';
+import 'package:guet_card/Global.dart';
 import 'package:guet_card/Routes.dart';
 import 'package:guet_card/pages/HomePage/widgets/AntiScamCard.dart';
 import 'package:guet_card/pages/HomePage/widgets/AppTitle.dart';
@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          primarySwatch: Const.black,
+          primarySwatch: Global.black,
           brightness: Brightness.light,
           platform: TargetPlatform.iOS, // 设定目标平台为 iOS 以启用右滑返回手势
         ),
@@ -57,9 +57,9 @@ class HomeContent extends StatefulWidget {
 class _HomeContentState extends State<HomeContent> {
   late SharedPreferences _pref;
 
-  final String _addToHomepageImageUrl = Const.networkImages["addToHomepageImage"]!;
+  final String _addToHomepageImageUrl = Global.networkImages["addToHomepageImage"]!;
   final String _showUseGuideImgUrl =
-      kIsWeb ? Const.networkImages["showUseGuideImg"]! : Const.assetImages["showUseGuideImg"]!;
+      kIsWeb ? Global.networkImages["showUseGuideImg"]! : Global.assetImages["showUseGuideImg"]!;
 
   void _showGuide(BuildContext context) {
     void _showAddToHomepageGuide(Function() callback) {
@@ -146,7 +146,7 @@ class _HomeContentState extends State<HomeContent> {
     // 之后StatefulWidget 需要刷新UI 也不会被调用
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (kIsWeb) {
-        Const.networkImages.forEach((key, value) {
+        Global.networkImages.forEach((key, value) {
           precacheImage(NetworkImage(value), context);
         });
       } else {

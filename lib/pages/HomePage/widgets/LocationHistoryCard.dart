@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
-import '../../../Const.dart';
+import '../../../Global.dart';
 
 /// 行程卡卡片
 class LocationHistoryCard extends StatelessWidget {
@@ -38,12 +38,11 @@ class LocationHistoryCard extends StatelessWidget {
                   child: Builder(
                     builder: (BuildContext context) {
                       return kIsWeb
-                          ? WebImageWithIndicator(imgURL: Const.networkImages["location-history"]!)
-                          : Image.asset(Const.assetImages["location-history"]!);
+                          ? WebImageWithIndicator(imgURL: Global.networkImages["location-history"]!)
+                          : Image.asset(Global.assetImages["location-history"]!);
                     },
                   ),
-                )
-            ),
+                )),
             Center(
               child: Column(
                 children: [

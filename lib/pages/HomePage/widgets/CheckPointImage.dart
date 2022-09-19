@@ -2,7 +2,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../Const.dart';
+import '../../../Global.dart';
 import '../../../public-widgets/WebImageWithIndicator.dart';
 
 /// 检查点照片组件
@@ -15,10 +15,10 @@ class CheckPointImageView extends StatefulWidget {
 
 class _CheckPointImageViewState extends State<CheckPointImageView> {
   final List<String> checkPointImgs = [
-    kIsWeb ? Const.networkImages["huajiang"]! : Const.assetImages["huajiang"]!,
-    kIsWeb ? Const.networkImages["houjie"]! : Const.assetImages["houjie"]!,
-    kIsWeb ? Const.networkImages["jinjiling"]! : Const.assetImages["jinjiling"]!,
-    kIsWeb ? Const.networkImages["dongqu"]! : Const.assetImages["dongqu"]!,
+    kIsWeb ? Global.networkImages["huajiang"]! : Global.assetImages["huajiang"]!,
+    kIsWeb ? Global.networkImages["houjie"]! : Global.assetImages["houjie"]!,
+    kIsWeb ? Global.networkImages["jinjiling"]! : Global.assetImages["jinjiling"]!,
+    kIsWeb ? Global.networkImages["dongqu"]! : Global.assetImages["dongqu"]!,
   ];
 
   @override

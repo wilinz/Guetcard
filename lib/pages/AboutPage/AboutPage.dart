@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:guet_card/Const.dart';
+import 'package:guet_card/Global.dart';
 import 'package:guet_card/public-classes/CheckingUpdate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,7 +17,7 @@ class AboutPage extends StatelessWidget {
 
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
 
-![](${Const.networkImages["showUseGuideImg"]!})
+![](${Global.networkImages["showUseGuideImg"]!})
 
 # 版权信息
 本项目使用 [MIT](https://gitee.com/guetcard/guetcard/blob/master/LICENSE) 授权。

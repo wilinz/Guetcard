@@ -1,12 +1,16 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:bmprogresshud/progresshud.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
+import '../Global.dart';
 
 class CheckingUpdate {
   static Future<String> initPackageInfo() async {
@@ -39,8 +43,7 @@ class CheckingUpdate {
         .then((value) async {
       Map<String, dynamic> map = value.data;
       String remoteVersion = map["tag_name"].replaceAll("v", "").replaceAll(".", "");
-      // TODO 记得改回 >
-      if (int.parse(remoteVersion) >= int.parse(currentVersion.replaceAll(".", ""))) {
+      if (int.parse(remoteVersion) > int.parse(currentVersion.replaceAll(".", ""))) {
         String? apkUrl;
         for (var item in map["assets"]) {
           if (item["name"] != null && item["name"].endsWith(".apk")) {
@@ -211,16 +214,47 @@ class _CheckingUpdateDialogState extends State<CheckingUpdateDialog> {
                                             : throw 'Could not launch ${widget.updateInfo["url"]}';
                                       } else if (!kIsWeb && Platform.isAndroid) {
                                         try {
-                                          if (widget.updateInfo['url'] != null)
+                                          if (widget.updateInfo['url'] != null) {
+                                            int progressId = Random().nextInt(999999);
+                                            bool pushLock = false;
                                             OtaUpdate().execute(widget.updateInfo['url']).listen((event) {
+                                              if (_progress == 1) {
+                                                Navigator.of(context).pop();
+                                                Global.flutterLocalNotificationsPlugin.cancel(progressId);
+                                                return;
+                                              }
                                               setState(() {
-                                                _progress = (double.tryParse(event.value ?? '0') ?? 0) / 100;
+                                                _progress = (double.tryParse(event.value ?? '0') ?? 1) / 100;
                                                 _status = event.status;
                                               });
-                                              if (_status == OtaStatus.INSTALLING) {
-                                                Navigator.of(context).pop();
+                                              if (!pushLock) {
+                                                final AndroidNotificationDetails androidNotificationDetails =
+                                                    AndroidNotificationDetails(
+                                                  'progress channel',
+                                                  'progress channel',
+                                                  channelShowBadge: false,
+                                                  importance: Importance.max,
+                                                  priority: Priority.high,
+                                                  onlyAlertOnce: true,
+                                                  showProgress: true,
+                                                  maxProgress: 100,
+                                                  progress: int.tryParse(event.value ?? '0') ?? 1,
+                                                );
+                                                final NotificationDetails notificationDetails =
+                                                    NotificationDetails(android: androidNotificationDetails);
+                                                Global.flutterLocalNotificationsPlugin.show(
+                                                  progressId,
+                                                  '正在下载更新...',
+                                                  '',
+                                                  notificationDetails,
+                                                  payload: '正在下载更新...',
+                                                );
+                                                pushLock = true;
+                                                Future.delayed(Duration(milliseconds: 100))
+                                                    .then((value) => pushLock = false);
                                               }
                                             });
+                                          }
                                         } catch (e) {
                                           print('升级失败，原因：$e');
                                           ScaffoldMessenger.of(context).showSnackBar(
