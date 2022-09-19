@@ -6,11 +6,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:guet_card/Global.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-
-import '../Global.dart';
 
 class CheckingUpdate {
   static Future<String> initPackageInfo() async {
@@ -109,7 +108,6 @@ class CheckingUpdateDialog extends StatefulWidget {
 
 class _CheckingUpdateDialogState extends State<CheckingUpdateDialog> {
   double _progress = 0;
-  OtaStatus? _status;
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +223,6 @@ class _CheckingUpdateDialogState extends State<CheckingUpdateDialog> {
                                               }
                                               setState(() {
                                                 _progress = (double.tryParse(event.value ?? '0') ?? 1) / 100;
-                                                _status = event.status;
                                               });
                                               if (!pushLock) {
                                                 final AndroidNotificationDetails androidNotificationDetails =

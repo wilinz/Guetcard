@@ -1,9 +1,11 @@
 import 'package:bmprogresshud/progresshud.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:guet_card/Global.dart';
 import 'package:guet_card/Routes.dart';
+import 'package:guet_card/main.dart';
 import 'package:guet_card/pages/HomePage/widgets/AntiScamCard.dart';
 import 'package:guet_card/pages/HomePage/widgets/AppTitle.dart';
 import 'package:guet_card/pages/HomePage/widgets/Avatar.dart';
@@ -153,25 +155,25 @@ class _HomeContentState extends State<HomeContent> {
         CheckingUpdate.checkForUpdate(context);
       }
       // 启动一秒后开始预缓存头像列表和头像图片
-      // Future.delayed(Duration(seconds: 1), () {
-      //   Dio().get(Const.avatarListUrl).then((value) {
-      //     if (avatarList.length == 0) {
-      //       var list = value.toString().split('\n');
-      //       for (String line in list) {
-      //         if (line.length > 0 && line.startsWith("http")) {
-      //           avatarList.add(line);
-      //         }
-      //       }
-      //       for (var img in avatarList.sublist(0, 20)) {
-      //         precacheImage(NetworkImage(img), context);
-      //       }
-      //     }
-      //   }).onError((error, stackTrace) {
-      //     debugPrint("头像列表下载失败:");
-      //     debugPrint("error: $error");
-      //     ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
-      //   });
-      // });
+      Future.delayed(Duration(seconds: 1), () {
+        Dio().get(Global.avatarListUrl).then((value) {
+          if (avatarList.length == 0) {
+            var list = value.toString().split('\n');
+            for (String line in list) {
+              if (line.length > 0 && line.startsWith("http")) {
+                avatarList.add(line);
+              }
+            }
+            for (var img in avatarList.sublist(0, 20)) {
+              precacheImage(NetworkImage(img), context);
+            }
+          }
+        }).onError((error, stackTrace) {
+          debugPrint("头像列表下载失败:");
+          debugPrint("error: $error");
+          ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
+        });
+      });
     });
   }
 

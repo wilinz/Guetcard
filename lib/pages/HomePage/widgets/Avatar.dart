@@ -9,8 +9,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../Global.dart';
-import '../../../public-widgets/WebImageWithIndicator.dart';
+import 'package:guet_card/Global.dart';
+import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
 /// 头像组件，负责调用切换头像的页面及更换头像功能
 class Avatar extends StatefulWidget {

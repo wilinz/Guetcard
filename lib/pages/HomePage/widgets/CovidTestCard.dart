@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
-import '../../../Global.dart';
+import 'package:guet_card/Global.dart';
 
 /// 核酸检测卡片
 class CovidTestCard extends StatelessWidget {

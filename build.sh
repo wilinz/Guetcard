@@ -37,6 +37,8 @@ iOS_archive() {
 }
 
 tmux_build_all() {
+    flutter clean
+    flutter pub get
     tmux new-session -s "flutter_build" -d
     tmux send -t "flutter_build" "./build.sh web && exit" Enter
     tmux split-window -h
@@ -48,9 +50,11 @@ tmux_build_all() {
 }
 
 build_all() {
+    flutter clean
+    flutter pub get
     build_web &
     build_apk &
-    build_iOS_archive &
+    (build_iOS && iOS_archive) &
 }
 
 print_help() {

@@ -2,9 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../Global.dart';
-import '../../../main.dart';
-import '../../../public-widgets/WebImageWithIndicator.dart';
+import 'package:guet_card/Global.dart';
+import 'package:guet_card/main.dart';
+import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
 /// 懒加载的图像列表，能自适应屏幕尺寸并调整图像列数
 class LazyImgList extends StatefulWidget {

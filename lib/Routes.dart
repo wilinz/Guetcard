@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'pages/AboutPage/AboutPage.dart';
-import 'pages/ChangeAvatarPage/ChangeAvatarPage.dart';
-import 'pages/CropAvatarPage/CropAvatarPage.dart';
-import 'pages/HomePage/HomePage.dart';
+import 'package:guet_card/pages/AboutPage/AboutPage.dart';
+import 'package:guet_card/pages/ChangeAvatarPage/ChangeAvatarPage.dart';
+import 'package:guet_card/pages/CropAvatarPage/CropAvatarPage.dart';
+import 'package:guet_card/pages/HomePage/HomePage.dart';
 
 class Routes {
   static Map<String, Widget Function(BuildContext)> routes = {

@@ -2,8 +2,8 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../Global.dart';
-import '../../../public-widgets/WebImageWithIndicator.dart';
+import 'package:guet_card/Global.dart';
+import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
 /// 检查点照片组件
 class CheckPointImageView extends StatefulWidget {

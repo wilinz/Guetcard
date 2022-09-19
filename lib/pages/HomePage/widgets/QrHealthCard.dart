@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-import '../../../Global.dart';
-import '../../../public-classes/UsernameModel.dart';
+import 'package:guet_card/Global.dart';
+import 'package:guet_card/public-classes/UsernameModel.dart';
 
 /// 健康码卡片视图
 class QrHealthCard extends StatelessWidget {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../public-classes/UsernameModel.dart';
-import '../../../public-widgets/InputDialog.dart';
+import 'package:guet_card/public-classes/UsernameModel.dart';
+import 'package:guet_card/public-widgets/InputDialog.dart';
 
 /// 显示姓名的动态组件
 class Name extends StatefulWidget {

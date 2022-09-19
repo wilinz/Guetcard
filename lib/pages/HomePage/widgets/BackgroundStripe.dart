@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../CustomPainters/BackgroundPainter.dart';
+import 'package:guet_card/CustomPainters/BackgroundPainter.dart';
 
 class BackgroundStripe extends StatelessWidget {
   const BackgroundStripe({Key? key}) : super(key: key);
