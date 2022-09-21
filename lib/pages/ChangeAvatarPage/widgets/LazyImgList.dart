@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:guet_card/Global.dart';
 import 'package:guet_card/main.dart';
 import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
@@ -29,7 +28,7 @@ class _LazyImgListState extends State<LazyImgList> {
     await dio.get(Global.avatarListUrl).then(
       (value) {
         if (avatarList.length == 0) {
-          var list = value.toString().split('\n');
+          var list = value.toString().replaceAll('\r', '').split('\n');
           for (String line in list) {
             if (line.length > 0 && line.startsWith("http")) {
               avatarList.add(line);
@@ -87,7 +86,7 @@ class _LazyImgListState extends State<LazyImgList> {
                     onPressed: () async {
                       Navigator.of(context).pop(avatarList[vindex * imgPerRow + hindex]);
                     },
-                    child: WebImageWithIndicator(imgURL: avatarList[vindex * imgPerRow + hindex])),
+                    child: WebImageWithLoadingIndicator(imgURL: avatarList[vindex * imgPerRow + hindex])),
               );
             };
 

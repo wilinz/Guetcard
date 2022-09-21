@@ -1,7 +1,6 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:guet_card/Global.dart';
 import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
@@ -34,7 +33,7 @@ class _CheckPointImageViewState extends State<CheckPointImageView> {
           itemCount: checkPointImgs.length,
           itemBuilder: (context, index) {
             if (kIsWeb) {
-              return WebImageWithIndicator(imgURL: checkPointImgs[index]);
+              return WebImageWithLoadingIndicator(imgURL: checkPointImgs[index]);
             }
             return Image.asset(
               checkPointImgs[index],

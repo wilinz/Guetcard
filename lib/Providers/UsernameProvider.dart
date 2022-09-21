@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-class UsernameModel with ChangeNotifier {
+class UsernameProvider with ChangeNotifier {
   String _username;
-  UsernameModel(this._username);
+  UsernameProvider(this._username);
 
   set username(String name) {
     _username = (name.length > 0) ? name.characters.first : "";
     notifyListeners();
   }
+
   String get username => _username;
 
   /// setter 方法的别名

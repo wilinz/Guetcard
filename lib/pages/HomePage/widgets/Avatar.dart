@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bmprogresshud/progresshud.dart';
@@ -9,7 +10,6 @@ import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 /// 头像组件，负责调用切换头像的页面及更换头像功能
 class Avatar extends StatefulWidget {
@@ -45,7 +45,7 @@ class _AvatarState extends State<Avatar> {
       var doc = await getApplicationDocumentsDirectory();
       String? avatarFileName = pref.getString("userAvatar");
       if (avatarFileName != null) {
-        if (avatarFileName.startsWith("http")) {
+        if (avatarFileName.startsWith("http") || avatarFileName.startsWith('base64:')) {
           if (mounted) {
             setState(() {
               _avatarPath = avatarFileName;
@@ -168,53 +168,30 @@ class _AvatarState extends State<Avatar> {
     sheetContent.add(
       ListTile(
         leading: Icon(Icons.image),
-        title: Text("从默认头像中选择",
-            style: TextStyle(
-              fontFamily: "PingFangSC",
-            )),
+        title: Text(
+          "从默认头像中选择",
+          style: TextStyle(
+            fontFamily: "PingFangSC",
+          ),
+        ),
         onTap: () async {
           Navigator.pop(context);
           String? url = await Navigator.of(context).pushNamed("changeAvatarPage") as String?;
           if (url != null) {
-            if (kIsWeb) {
-              String path = url;
-              if (mounted) {
-                setState(() {
-                  _avatarPath = path;
-                });
-              }
-              _saveUserAvatar(path);
-            } else {
+            try {
               ProgressHud.showLoading(text: "正在保存...");
-              var docPath = await getApplicationDocumentsDirectory();
-              var pref = await SharedPreferences.getInstance();
-              var lastAvatar = pref.getString("userAvatar");
-              var dir = await getApplicationDocumentsDirectory();
-              var name = "${Uuid().v4()}";
-              var ext = url.toString().split(".").last;
-              Dio().download(url, "${dir.path}/$name.$ext").then(
-                (value) {
-                  if (value.statusCode == 200) {
-                    ProgressHud.dismiss();
-                    if (lastAvatar != null && !lastAvatar.startsWith("http")) {
-                      _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
-                    }
-                    if (mounted) {
-                      setState(() {
-                        _avatarPath = "${dir.path}/$name.$ext";
-                      });
-                    }
-                    _saveUserAvatar("$name.$ext");
-                  } else {
-                    ProgressHud.dismiss();
-                    ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
-                  }
-                },
-                onError: (error, stackTrace) {
-                  ProgressHud.dismiss();
-                  ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
-                },
-              );
+              Response value = await Dio().get<List<int>>(url, options: Options(responseType: ResponseType.bytes));
+              // 下载后转 base64 存储到 SharedPref（网页上实际是存到LocalStorage）
+              String b64String = 'base64:${base64Encode(value.data)}';
+              _saveUserAvatar(b64String);
+              setState(() {
+                _avatarPath = b64String;
+              });
+              ProgressHud.dismiss();
+            } on DioError catch (e) {
+              print(e);
+              ProgressHud.dismiss();
+              ProgressHud.showErrorAndDismiss(text: '保存头像失败');
             }
           }
         },
@@ -229,73 +206,41 @@ class _AvatarState extends State<Avatar> {
             )),
         onTap: () async {
           Navigator.pop(context);
-          Future<String> getAvatarUrl() async {
-            final result = await Dio().get("https://api.vvhan.com/api/avatar?type=json");
-            return result.data["avatar"];
-          }
 
           List<String> apiUrls = [
-            'https://api.vvhan.com/api/avatar',
             'https://api.sunweihu.com/api/sjtx/api.php',
+            'http://juapi.org/api/sjtx.php',
+            'https://api.qicaiyun.top/sjtx/api.php',
           ];
 
-          if (kIsWeb) {
-            ProgressHud.showLoading(text: "正在加载...");
-            Future.delayed(Duration(seconds: 5)).then((value) => ProgressHud.dismiss());
-            // for (String url in apiUrls) {
-            //   Response value = await Dio().get(url);
-            //   // TODO: 下载后转 base64 存储
-            //   print(value.data);
-            // }
-            var url = await getAvatarUrl();
-            String path = url;
-            if (mounted) {
-              setState(() {
-                _avatarPath = path;
-              });
-            }
-            _saveUserAvatar(path);
-          } else {
+          ProgressHud.showLoading(text: "正在保存...");
+          bool _success = false;
+          for (String url in apiUrls) {
             try {
-              ProgressHud.showLoading(text: "正在保存...");
-              var docPath = await getApplicationDocumentsDirectory();
-              var pref = await SharedPreferences.getInstance();
-              var lastAvatar = pref.getString("userAvatar");
-              for (String url in apiUrls) {
-                var dir = await getApplicationDocumentsDirectory();
-                var name = "${Uuid().v4()}";
-                var ext = url.toString().split(".").last;
-                Response value = await Dio().download(url, "${dir.path}/$name.$ext");
-                if (value.statusCode == 200) {
-                  ProgressHud.dismiss();
-                  if (lastAvatar != null && !lastAvatar.startsWith("http")) {
-                    _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
-                  }
-                  if (mounted) {
-                    setState(() {
-                      _avatarPath = "${dir.path}/$name.$ext";
-                    });
-                  }
-                  _saveUserAvatar("$name.$ext");
-                  break;
-                } else {
-                  print('下载随机头像时出现 ${value.statusCode}, ${value.statusMessage}');
-                  ProgressHud.dismiss();
-                  ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
-                }
-              }
+              Response value = await Dio().get<List<int>>(url, options: Options(responseType: ResponseType.bytes));
+              // 下载后转 base64 存储到 SharedPref（网页上实际是存到LocalStorage）
+              String b64String = 'base64:${base64Encode(value.data)}';
+              _saveUserAvatar(b64String);
+              setState(() {
+                _avatarPath = b64String;
+              });
+              ProgressHud.dismiss();
+              _success = true;
+              break;
             } on DioError catch (e) {
               print(e);
-              ProgressHud.dismiss();
-              ProgressHud.showErrorAndDismiss(text: "获取随机头像失败");
             }
+          }
+          if (!_success) {
+            ProgressHud.dismiss();
+            ProgressHud.showErrorAndDismiss(text: '保存头像失败');
           }
         },
       ),
     );
     sheetContent.add(SizedBox(height: 10));
 
-    late var img;
+    late Widget img;
     if (_avatarPath.startsWith("assets")) {
       // 如果路径的开头是 assets 则意味着是从 asset 中加载默认头像
       img = Image.asset(
@@ -304,8 +249,13 @@ class _AvatarState extends State<Avatar> {
       );
     } else if (_avatarPath.startsWith("http")) {
       // 如果路径开头是 http 则意味着是从网络上加载自定义头像
-      img = WebImageWithIndicator(
+      img = WebImageWithLoadingIndicator(
         imgURL: _avatarPath,
+        width: _width,
+      );
+    } else if (_avatarPath.startsWith('base64:')) {
+      img = Image.memory(
+        base64Decode(_avatarPath.split(':')[1]),
         width: _width,
       );
     } else {

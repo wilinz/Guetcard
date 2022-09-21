@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:guet_card/Providers/UsernameProvider.dart';
+import 'package:guet_card/public-widgets/InputDialog.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:guet_card/public-classes/UsernameModel.dart';
-import 'package:guet_card/public-widgets/InputDialog.dart';
 
 /// 显示姓名的动态组件
 class Name extends StatefulWidget {
@@ -37,7 +36,7 @@ class _NameState extends State<Name> {
             if (_controller.text.length > 1) {
               _controller.text = _controller.text.characters.first;
             }
-            Provider.of<UsernameModel>(context, listen: false).username = _controller.text;
+            Provider.of<UsernameProvider>(context, listen: false).username = _controller.text;
             await pref.setString("name", _controller.text);
             Navigator.of(context).pop();
           },
@@ -45,7 +44,7 @@ class _NameState extends State<Name> {
         );
       },
     ).then((val) {
-      _controller.text = Provider.of<UsernameModel>(context, listen: false).username;
+      _controller.text = Provider.of<UsernameProvider>(context, listen: false).username;
     });
   }
 
@@ -54,7 +53,7 @@ class _NameState extends State<Name> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((duration) {
       _getNameFromPref().then((String name) async {
-        Provider.of<UsernameModel>(context, listen: false).username = name;
+        Provider.of<UsernameProvider>(context, listen: false).username = name;
         _controller.text = name;
       });
     });
@@ -71,7 +70,7 @@ class _NameState extends State<Name> {
             Row(
               children: [
                 Text(
-                  "**${Provider.of<UsernameModel>(context).username} 可以通行",
+                  "**${Provider.of<UsernameProvider>(context).username} 可以通行",
                   maxLines: 1,
                   style: TextStyle(
                     fontFamily: "PingFangSC-Heavy",

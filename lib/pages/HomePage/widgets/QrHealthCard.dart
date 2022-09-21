@@ -2,12 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:guet_card/Global.dart';
+import 'package:guet_card/Providers/UsernameProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:transparent_image/transparent_image.dart';
-
-import 'package:guet_card/Global.dart';
-import 'package:guet_card/public-classes/UsernameModel.dart';
 
 /// 健康码卡片视图
 class QrHealthCard extends StatelessWidget {
@@ -57,7 +56,7 @@ class QrHealthCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "**${Provider.of<UsernameModel>(context).username}的广西健康码",
+                    "**${Provider.of<UsernameProvider>(context).username}的广西健康码",
                     maxLines: 1,
                     style: TextStyle(
                       fontFamily: "PingFangSC-Heavy",
@@ -67,7 +66,7 @@ class QrHealthCard extends StatelessWidget {
                   ),
                   Padding(padding: EdgeInsets.symmetric(vertical: 3)),
                   Text(
-                    "姓名：**${Provider.of<UsernameModel>(context).username}\n证件类型：身份证\n证件号码：$randNum1********$randNum2",
+                    "姓名：**${Provider.of<UsernameProvider>(context).username}\n证件类型：身份证\n证件号码：$randNum1********$randNum2",
                     style: TextStyle(
                       fontFamily: "PingFangSC",
                       color: Colors.grey,

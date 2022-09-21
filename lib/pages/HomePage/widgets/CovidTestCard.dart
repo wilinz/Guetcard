@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
-
 import 'package:guet_card/Global.dart';
+import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
 /// 核酸检测卡片
 class CovidTestCard extends StatelessWidget {
@@ -38,7 +37,7 @@ class CovidTestCard extends StatelessWidget {
                   child: Builder(
                     builder: (BuildContext context) {
                       return kIsWeb
-                          ? WebImageWithIndicator(imgURL: Global.networkImages["test-tube"]!)
+                          ? WebImageWithLoadingIndicator(imgURL: Global.networkImages["test-tube"]!)
                           : Image.asset(Global.assetImages["test-tube"]!);
                     },
                   ),

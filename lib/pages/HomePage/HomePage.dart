@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:guet_card/Global.dart';
 import 'package:guet_card/Routes.dart';
+import 'package:guet_card/Utils/CheckingUpdate.dart';
+import 'package:guet_card/Utils/WebJS/WebJSMethods.dart';
 import 'package:guet_card/main.dart';
 import 'package:guet_card/pages/HomePage/widgets/AntiScamCard.dart';
 import 'package:guet_card/pages/HomePage/widgets/AppTitle.dart';
@@ -17,8 +19,6 @@ import 'package:guet_card/pages/HomePage/widgets/EntryPermit.dart';
 import 'package:guet_card/pages/HomePage/widgets/Name.dart';
 import 'package:guet_card/pages/HomePage/widgets/Passport.dart';
 import 'package:guet_card/pages/HomePage/widgets/TopRightButton.dart';
-import 'package:guet_card/public-classes/CheckingUpdate.dart';
-import 'package:guet_card/public-classes/WebJSMethods.dart';
 import 'package:guet_card/public-widgets/BlackCornerRadius.dart';
 import 'package:guet_card/public-widgets/IntroImage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -158,7 +158,7 @@ class _HomeContentState extends State<HomeContent> {
       Future.delayed(Duration(seconds: 1), () {
         Dio().get(Global.avatarListUrl).then((value) {
           if (avatarList.length == 0) {
-            var list = value.toString().split('\n');
+            var list = value.toString().replaceAll('\r', '').split('\n');
             for (String line in list) {
               if (line.length > 0 && line.startsWith("http")) {
                 avatarList.add(line);

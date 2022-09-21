@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:guet_card/CustomPainters/BlackCornerRadiusPainter.dart';
-
-import 'package:guet_card/public-classes/WebJSMethods.dart';
+import 'package:guet_card/Utils/WebJS/WebJSMethods.dart';
 
 class BlackCornerRadius extends StatelessWidget {
   const BlackCornerRadius({Key? key}) : super(key: key);

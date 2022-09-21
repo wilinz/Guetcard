@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:guet_card/Global.dart';
-import 'package:guet_card/Utils.dart';
+import 'package:guet_card/Utils/Utils.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher_string.dart';
