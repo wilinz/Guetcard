@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:guet_card/Global.dart';
+import 'package:guet_card/Utils/LogUtil.dart';
 import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -68,8 +69,8 @@ class _AvatarState extends State<Avatar> {
       File lastAvatar = File(lastAvatarPath);
       try {
         lastAvatar.deleteSync();
-      } catch (e) {
-        debugPrint(e.toString());
+      } catch (error, stackTrace) {
+        LogUtil.error(message: '删除旧头像出错', error: error, stackTrace: stackTrace);
       }
     }
   }
@@ -188,8 +189,8 @@ class _AvatarState extends State<Avatar> {
                 _avatarPath = b64String;
               });
               ProgressHud.dismiss();
-            } on DioError catch (e) {
-              print(e);
+            } catch (error, stackTrace) {
+              LogUtil.error(message: '保存默认头像失败', error: error, stackTrace: stackTrace);
               ProgressHud.dismiss();
               ProgressHud.showErrorAndDismiss(text: '保存头像失败');
             }
@@ -227,8 +228,8 @@ class _AvatarState extends State<Avatar> {
               ProgressHud.dismiss();
               _success = true;
               break;
-            } on DioError catch (e) {
-              print(e);
+            } catch (error, stackTrace) {
+              LogUtil.error(message: '保存随机头像失败', error: error, stackTrace: stackTrace);
             }
           }
           if (!_success) {

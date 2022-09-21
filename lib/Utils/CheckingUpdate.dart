@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:guet_card/Global.dart';
+import 'package:guet_card/Utils/LogUtil.dart';
 import 'package:guet_card/Utils/Utils.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:package_info/package_info.dart';
@@ -264,8 +265,8 @@ class _CheckingUpdateDialogState extends State<CheckingUpdateDialog> {
                                               }
                                             });
                                           }
-                                        } catch (e) {
-                                          print('更新失败，原因：$e');
+                                        } catch (error, stackTrace) {
+                                          LogUtil.error(message: '更新失败', error: e, stackTrace: stackTrace);
                                           ProgressHud.showErrorAndDismiss(text: '更新失败：下载更新包失败');
                                         }
                                       }
