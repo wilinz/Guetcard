@@ -234,9 +234,19 @@ class _AvatarState extends State<Avatar> {
             return result.data["avatar"];
           }
 
+          List<String> apiUrls = [
+            'https://api.vvhan.com/api/avatar',
+            'https://api.sunweihu.com/api/sjtx/api.php',
+          ];
+
           if (kIsWeb) {
             ProgressHud.showLoading(text: "正在加载...");
             Future.delayed(Duration(seconds: 5)).then((value) => ProgressHud.dismiss());
+            // for (String url in apiUrls) {
+            //   Response value = await Dio().get(url);
+            //   // TODO: 下载后转 base64 存储
+            //   print(value.data);
+            // }
             var url = await getAvatarUrl();
             String path = url;
             if (mounted) {
@@ -251,35 +261,29 @@ class _AvatarState extends State<Avatar> {
               var docPath = await getApplicationDocumentsDirectory();
               var pref = await SharedPreferences.getInstance();
               var lastAvatar = pref.getString("userAvatar");
-              var url = await getAvatarUrl();
-              var dir = await getApplicationDocumentsDirectory();
-              var name = "${Uuid().v4()}";
-              var ext = url.toString().split(".").last;
-              Dio().download(url, "${dir.path}/$name.$ext").then(
-                (value) {
-                  if (value.statusCode == 200) {
-                    ProgressHud.dismiss();
-                    if (lastAvatar != null && !lastAvatar.startsWith("http")) {
-                      _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
-                    }
-                    if (mounted) {
-                      setState(() {
-                        _avatarPath = "${dir.path}/$name.$ext";
-                      });
-                    }
-                    _saveUserAvatar("$name.$ext");
-                  } else {
-                    print('下载随机头像时出现 ${value.statusCode}, ${value.statusMessage}');
-                    ProgressHud.dismiss();
-                    ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
+              for (String url in apiUrls) {
+                var dir = await getApplicationDocumentsDirectory();
+                var name = "${Uuid().v4()}";
+                var ext = url.toString().split(".").last;
+                Response value = await Dio().download(url, "${dir.path}/$name.$ext");
+                if (value.statusCode == 200) {
+                  ProgressHud.dismiss();
+                  if (lastAvatar != null && !lastAvatar.startsWith("http")) {
+                    _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
                   }
-                },
-                onError: (error, stackTrace) {
-                  print('$error\n$stackTrace');
+                  if (mounted) {
+                    setState(() {
+                      _avatarPath = "${dir.path}/$name.$ext";
+                    });
+                  }
+                  _saveUserAvatar("$name.$ext");
+                  break;
+                } else {
+                  print('下载随机头像时出现 ${value.statusCode}, ${value.statusMessage}');
                   ProgressHud.dismiss();
                   ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
-                },
-              );
+                }
+              }
             } on DioError catch (e) {
               print(e);
               ProgressHud.dismiss();
