@@ -4,13 +4,12 @@ import 'package:bmprogresshud/progresshud.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:guet_card/Global.dart';
+import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-
-import 'package:guet_card/Global.dart';
-import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
 /// 头像组件，负责调用切换头像的页面及更换头像功能
 class Avatar extends StatefulWidget {
@@ -247,37 +246,45 @@ class _AvatarState extends State<Avatar> {
             }
             _saveUserAvatar(path);
           } else {
-            ProgressHud.showLoading(text: "正在保存...");
-            var docPath = await getApplicationDocumentsDirectory();
-            var pref = await SharedPreferences.getInstance();
-            var lastAvatar = pref.getString("userAvatar");
-            var url = await getAvatarUrl();
-            var dir = await getApplicationDocumentsDirectory();
-            var name = "${Uuid().v4()}";
-            var ext = url.toString().split(".").last;
-            Dio().download(url, "${dir.path}/$name.$ext").then(
-              (value) {
-                if (value.statusCode == 200) {
-                  ProgressHud.dismiss();
-                  if (lastAvatar != null && !lastAvatar.startsWith("http")) {
-                    _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
+            try {
+              ProgressHud.showLoading(text: "正在保存...");
+              var docPath = await getApplicationDocumentsDirectory();
+              var pref = await SharedPreferences.getInstance();
+              var lastAvatar = pref.getString("userAvatar");
+              var url = await getAvatarUrl();
+              var dir = await getApplicationDocumentsDirectory();
+              var name = "${Uuid().v4()}";
+              var ext = url.toString().split(".").last;
+              Dio().download(url, "${dir.path}/$name.$ext").then(
+                (value) {
+                  if (value.statusCode == 200) {
+                    ProgressHud.dismiss();
+                    if (lastAvatar != null && !lastAvatar.startsWith("http")) {
+                      _deletePreviousAvatar("${docPath.path}/${pref.getString("userAvatar")}");
+                    }
+                    if (mounted) {
+                      setState(() {
+                        _avatarPath = "${dir.path}/$name.$ext";
+                      });
+                    }
+                    _saveUserAvatar("$name.$ext");
+                  } else {
+                    print('下载随机头像时出现 ${value.statusCode}, ${value.statusMessage}');
+                    ProgressHud.dismiss();
+                    ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
                   }
-                  if (mounted) {
-                    setState(() {
-                      _avatarPath = "${dir.path}/$name.$ext";
-                    });
-                  }
-                  _saveUserAvatar("$name.$ext");
-                } else {
+                },
+                onError: (error, stackTrace) {
+                  print('$error\n$stackTrace');
                   ProgressHud.dismiss();
                   ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
-                }
-              },
-              onError: (error, stackTrace) {
-                ProgressHud.dismiss();
-                ProgressHud.showErrorAndDismiss(text: "保存失败，请重试");
-              },
-            );
+                },
+              );
+            } on DioError catch (e) {
+              print(e);
+              ProgressHud.dismiss();
+              ProgressHud.showErrorAndDismiss(text: "获取随机头像失败");
+            }
           }
         },
       ),

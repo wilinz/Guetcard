@@ -42,9 +42,12 @@ class CheckingUpdate {
       String remoteVersion = map["tag_name"].replaceAll("v", "").replaceAll(".", "");
       if (int.parse(remoteVersion) > int.parse(currentVersion.replaceAll(".", ""))) {
         String? apkUrl;
+        String? ipaUrl;
         for (var item in map["assets"]) {
           if (item["name"] != null && item["name"].endsWith(".apk")) {
             apkUrl = item["browser_download_url"];
+          } else if (item['name'] != null && item['name'].endsWith('ipa')) {
+            ipaUrl = item['browser_download_url'];
           }
         }
 
@@ -56,7 +59,7 @@ class CheckingUpdate {
           });
         } else if (Platform.isIOS) {
           _showUpdateDialog(context, {
-            "url": "https://gitee.com/guetcard/guetcard/releases",
+            "url": ipaUrl,
             "versionName": map["tag_name"],
             "description": map["body"],
           });
@@ -153,13 +156,14 @@ class _CheckingUpdateDialogState extends State<CheckingUpdateDialog> {
                                   fontSize: 16.0,
                                 ),
                               ),
-                              onPressed: _progress > 0 ? null : () => Navigator.of(context).pop(), //关闭对话框
+                              onPressed:
+                                  _progress > 0 && _progress < 1 ? null : () => Navigator.of(context).pop(), //关闭对话框
                             ),
                           ),
                           SizedBox(
                             width: 100,
                             height: 45,
-                            child: _progress > 0
+                            child: _progress > 0 && _progress < 1
                                 ? Center(
                                     child: SizedBox.square(
                                       dimension: 30,
@@ -181,7 +185,10 @@ class _CheckingUpdateDialogState extends State<CheckingUpdateDialog> {
                                       if (!kIsWeb && Platform.isIOS) {
                                         Navigator.of(context).pop(); //关闭对话框
                                         await canLaunchUrlString(widget.updateInfo["url"])
-                                            ? await launchUrlString(widget.updateInfo["url"])
+                                            ? await launchUrlString(
+                                                widget.updateInfo["url"],
+                                                mode: LaunchMode.externalApplication,
+                                              )
                                             : throw 'Could not launch ${widget.updateInfo["url"]}';
                                       } else if (!kIsWeb && Platform.isAndroid) {
                                         try {
@@ -189,39 +196,71 @@ class _CheckingUpdateDialogState extends State<CheckingUpdateDialog> {
                                             int progressId = Random().nextInt(999999);
                                             bool pushLock = false;
                                             OtaUpdate().execute(widget.updateInfo['url']).listen((event) {
-                                              if (_progress == 1) {
-                                                Navigator.of(context).pop();
-                                                Global.flutterLocalNotificationsPlugin.cancel(progressId);
-                                                return;
-                                              }
-                                              setState(() {
-                                                _progress = (double.tryParse(event.value ?? '0') ?? 1) / 100;
-                                              });
-                                              if (!pushLock) {
-                                                final AndroidNotificationDetails androidNotificationDetails =
-                                                    AndroidNotificationDetails(
-                                                  'progress channel',
-                                                  'progress channel',
-                                                  channelShowBadge: false,
-                                                  importance: Importance.max,
-                                                  priority: Priority.high,
-                                                  onlyAlertOnce: true,
-                                                  showProgress: true,
-                                                  maxProgress: 100,
-                                                  progress: int.tryParse(event.value ?? '0') ?? 1,
-                                                );
-                                                final NotificationDetails notificationDetails =
-                                                    NotificationDetails(android: androidNotificationDetails);
-                                                Global.flutterLocalNotificationsPlugin.show(
-                                                  progressId,
-                                                  '正在下载更新...',
-                                                  '',
-                                                  notificationDetails,
-                                                  payload: '正在下载更新...',
-                                                );
-                                                pushLock = true;
-                                                Future.delayed(Duration(milliseconds: 100))
-                                                    .then((value) => pushLock = false);
+                                              switch (event.status) {
+                                                case OtaStatus.DOWNLOADING:
+                                                  setState(() {
+                                                    _progress = (double.tryParse(event.value ?? '0') ?? 1) / 100;
+                                                  });
+                                                  if (!pushLock) {
+                                                    final AndroidNotificationDetails androidNotificationDetails =
+                                                        AndroidNotificationDetails(
+                                                      'progress channel',
+                                                      'progress channel',
+                                                      channelShowBadge: false,
+                                                      importance: Importance.max,
+                                                      priority: Priority.high,
+                                                      onlyAlertOnce: true,
+                                                      showProgress: true,
+                                                      maxProgress: 100,
+                                                      progress: int.tryParse(event.value ?? '0') ?? 1,
+                                                    );
+                                                    final NotificationDetails notificationDetails =
+                                                        NotificationDetails(android: androidNotificationDetails);
+                                                    Global.flutterLocalNotificationsPlugin.show(
+                                                      progressId,
+                                                      '正在下载更新...',
+                                                      '${event.value}%',
+                                                      notificationDetails,
+                                                    );
+                                                    pushLock = true;
+                                                    Future.delayed(Duration(milliseconds: 100))
+                                                        .then((value) => pushLock = false);
+                                                  }
+                                                  break;
+                                                case OtaStatus.INSTALLING:
+                                                  Navigator.of(context).pop();
+                                                  final AndroidNotificationDetails androidNotificationDetails =
+                                                      AndroidNotificationDetails(
+                                                    'progress channel',
+                                                    'progress channel',
+                                                    channelShowBadge: false,
+                                                    importance: Importance.max,
+                                                    priority: Priority.high,
+                                                    onlyAlertOnce: true,
+                                                    showProgress: false,
+                                                  );
+                                                  final NotificationDetails notificationDetails =
+                                                      NotificationDetails(android: androidNotificationDetails);
+                                                  Global.flutterLocalNotificationsPlugin.show(
+                                                    progressId,
+                                                    '更新下载完成',
+                                                    '',
+                                                    notificationDetails,
+                                                  );
+                                                  break;
+                                                case OtaStatus.PERMISSION_NOT_GRANTED_ERROR:
+                                                  Navigator.of(context).pop();
+                                                  ProgressHud.showErrorAndDismiss(text: '更新失败：用户未授权');
+                                                  break;
+                                                case OtaStatus.ALREADY_RUNNING_ERROR:
+                                                case OtaStatus.DOWNLOAD_ERROR:
+                                                case OtaStatus.INTERNAL_ERROR:
+                                                case OtaStatus.CHECKSUM_ERROR:
+                                                  Navigator.of(context).pop();
+                                                  ProgressHud.showErrorAndDismiss(text: '更新失败：下载更新包失败');
+                                                  break;
+                                                default:
+                                                  break;
                                               }
                                             });
                                           }
