@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Global {
+  static late String version;
   static const networkImages = {
     "goldenEdge": "https://s4.ax1x.com/2021/12/07/ogrOKO.png",
     "addToHomepageImage": "https://s4.ax1x.com/2021/12/07/ogrXrD.png",

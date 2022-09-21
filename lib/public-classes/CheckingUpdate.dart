@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -7,16 +8,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:guet_card/Global.dart';
+import 'package:guet_card/Utils.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class CheckingUpdate {
-  static Future<String> initPackageInfo() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String version = packageInfo.version;
-    return version;
-  }
+  static Future<String> initPackageInfo() async => (await PackageInfo.fromPlatform()).version;
 
   static Future<void> _showUpdateDialog(
     BuildContext context,
@@ -51,46 +49,21 @@ class CheckingUpdate {
         }
 
         if (Platform.isAndroid) {
-          // await FlutterXUpdate.init(
-          //   debug: false,
-          //   isWifiOnly: false,
-          // );
-          // UpdateEntity updateEntity = UpdateEntity(
-          //   isIgnorable: true,
-          //   hasUpdate: true,
-          //   versionCode: int.parse(remoteVersion),
-          //   versionName: map["tag_name"],
-          //   updateContent: map["body"],
-          //   downloadUrl: apkUrl,
-          // );
-          // FlutterXUpdate.updateByInfo(updateEntity: updateEntity);
-          Map<String, dynamic> updateInfo = {
-            "url": null,
-            "versionName": null,
-            "description": null,
-          };
-          updateInfo['url'] = apkUrl;
-          updateInfo['versionName'] = map["tag_name"];
-          updateInfo['description'] = map["body"];
-          _showUpdateDialog(context, updateInfo);
+          _showUpdateDialog(context, {
+            "url": apkUrl,
+            "versionName": map["tag_name"],
+            "description": map["body"],
+          });
         } else if (Platform.isIOS) {
-          Map<String, dynamic> updateInfo = {
-            "url": null,
-            "versionName": null,
-            "description": null,
-          };
-          updateInfo['url'] = "https://gitee.com/guetcard/guetcard/releases";
-          updateInfo['versionName'] = map["tag_name"];
-          updateInfo['description'] = map["body"];
-          _showUpdateDialog(context, updateInfo);
+          _showUpdateDialog(context, {
+            "url": "https://gitee.com/guetcard/guetcard/releases",
+            "versionName": map["tag_name"],
+            "description": map["body"],
+          });
         }
       } else {
         // 已是最新版本
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('✅当前已是最新版本'),
-          ),
-        );
+        Utils.showSnackBar(context, text: '✅当前已是最新版本');
       }
     }).onError((error, stackTrace) {
       ProgressHud.showErrorAndDismiss(text: "获取更新失败");
@@ -253,12 +226,8 @@ class _CheckingUpdateDialogState extends State<CheckingUpdateDialog> {
                                             });
                                           }
                                         } catch (e) {
-                                          print('升级失败，原因：$e');
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: const Text('很抱歉，升级失败了'),
-                                            ),
-                                          );
+                                          print('更新失败，原因：$e');
+                                          ProgressHud.showErrorAndDismiss(text: '更新失败：下载更新包失败');
                                         }
                                       }
                                     },

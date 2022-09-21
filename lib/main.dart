@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:guet_card/Global.dart';
 import 'package:guet_card/pages/HomePage/HomePage.dart';
+import 'package:guet_card/public-classes/CheckingUpdate.dart';
 import 'package:guet_card/public-classes/UsernameModel.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +42,7 @@ void main() {
       statusBarColor: Colors.transparent,
     ),
   );
+  CheckingUpdate.initPackageInfo().then((version) => Global.version = version);
   if (!kIsWeb && Platform.isAndroid) {
     Global.flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()

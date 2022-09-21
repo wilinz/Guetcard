@@ -2,17 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:guet_card/Global.dart';
+import 'package:guet_card/Utils.dart';
 import 'package:guet_card/public-classes/CheckingUpdate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-const String VERSION = "v1.5.5";
 
 /// “关于”页面，使用 Markdown 组件渲染显示
 class AboutPage extends StatelessWidget {
   AboutPage({Key? key}) : super(key: key);
   final String _md = '''
-# guet_card $VERSION
+# guet_card v${Global.version}
 一个使用 Flutter 重写的 [guet_card](https://gitee.com/guetcard/guetcard)，支持 Android、iOS、[网页端](https://guet-card.web.app)。
 
 此项目为 demo 项目，仅为个人兴趣开发，是学习 Flutter 框架之用，请各位遵循此原则，勿作他用。
@@ -36,11 +35,7 @@ class AboutPage extends StatelessWidget {
           onPressed: () async {
             var pref = await SharedPreferences.getInstance();
             pref.setBool("isSkipGuide", false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('👌下次启动时将会显示教程'),
-              ),
-            );
+            Utils.showSnackBar(context, text: '👌下次启动时将会显示教程');
           },
         ),
       ),
