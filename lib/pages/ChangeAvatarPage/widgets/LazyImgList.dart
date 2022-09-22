@@ -1,7 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:guet_card/Global.dart';
+import 'package:guet_card/Utils/Http.dart';
 import 'package:guet_card/main.dart';
 import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 
@@ -19,7 +19,7 @@ class _LazyImgListState extends State<LazyImgList> {
   bool _isLoadError = false;
   var _isLoading = false;
 
-  final dio = Dio();
+  final dio = Http().dio;
 
   Future<void> _loadAvatarList() async {
     if (kDebugMode) {

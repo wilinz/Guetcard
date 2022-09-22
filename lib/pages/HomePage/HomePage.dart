@@ -1,5 +1,4 @@
 import 'package:bmprogresshud/progresshud.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,6 +21,8 @@ import 'package:guet_card/pages/HomePage/widgets/TopRightButton.dart';
 import 'package:guet_card/public-widgets/BlackCornerRadius.dart';
 import 'package:guet_card/public-widgets/IntroImage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../Utils/Http.dart';
 
 /// app的根组件
 class HomePage extends StatelessWidget {
@@ -156,7 +157,7 @@ class _HomeContentState extends State<HomeContent> {
       }
       // 启动一秒后开始预缓存头像列表和头像图片
       Future.delayed(Duration(seconds: 1), () {
-        Dio().get(Global.avatarListUrl).then((value) {
+        Http().dio.get(Global.avatarListUrl).then((value) {
           if (avatarList.length == 0) {
             var list = value.toString().replaceAll('\r', '').split('\n');
             for (String line in list) {

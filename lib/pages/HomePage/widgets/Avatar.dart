@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:guet_card/Global.dart';
+import 'package:guet_card/Utils/Http.dart';
 import 'package:guet_card/public-widgets/WebImageWithIndicator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -217,7 +218,7 @@ class _AvatarState extends State<Avatar> {
           bool _success = false;
           for (String url in apiUrls) {
             try {
-              Response value = await Dio().get<List<int>>(url, options: Options(responseType: ResponseType.bytes));
+              Response value = await Http().dio.get<List<int>>(url, options: Options(responseType: ResponseType.bytes));
               // 下载后转 base64 存储到 SharedPref（网页上实际是存到LocalStorage）
               String b64String = 'base64:${base64Encode(value.data)}';
               _saveUserAvatar(b64String);

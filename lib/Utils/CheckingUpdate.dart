@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:bmprogresshud/progresshud.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -12,6 +11,8 @@ import 'package:guet_card/Utils/Utils.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
+import 'Http.dart';
 
 class CheckingUpdate {
   static Future<String> initPackageInfo() async => (await PackageInfo.fromPlatform()).version;
@@ -33,10 +34,11 @@ class CheckingUpdate {
 
   static void checkForUpdate(BuildContext context) async {
     String currentVersion = await initPackageInfo();
-    await Dio()
+    await Http()
+        .dio
         .get(
-      "https://gitee.com/api/v5/repos/guetcard/guetcard/releases/latest",
-    )
+          "https://gitee.com/api/v5/repos/guetcard/guetcard/releases/latest",
+        )
         .then((value) async {
       Map<String, dynamic> map = value.data;
       String remoteVersion = map["tag_name"].replaceAll("v", "").replaceAll(".", "");
