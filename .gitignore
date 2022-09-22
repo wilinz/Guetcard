@@ -7,8 +7,6 @@ PingFangSC-Heavy.ttf
 
 ### Firebase ###
 *firebase*
-*google-services*
-*GoogleService*
 
 ### idea ###
 *idea*
@@ -363,3 +361,5 @@ playground.xcworkspace
 !*.xcworkspace/contents.xcworkspacedata
 /*.gcno
 
+# Build files
+build/

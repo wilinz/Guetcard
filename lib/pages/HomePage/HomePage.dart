@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:guet_card/Global.dart';
 import 'package:guet_card/Routes.dart';
 import 'package:guet_card/Utils/CheckingUpdate.dart';
-import 'package:guet_card/Utils/LogUtil.dart';
 import 'package:guet_card/Utils/WebJS/WebJSMethods.dart';
 import 'package:guet_card/main.dart';
 import 'package:guet_card/pages/HomePage/widgets/AntiScamCard.dart';
@@ -170,7 +169,8 @@ class _HomeContentState extends State<HomeContent> {
             }
           }
         }).onError((error, stackTrace) {
-          LogUtil.error(message: "头像列表下载失败", error: error, stackTrace: stackTrace);
+          debugPrint("头像列表下载失败:");
+          debugPrint("error: $error");
           ProgressHud.showErrorAndDismiss(text: "头像列表下载失败");
         });
       });

@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,8 +7,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:guet_card/Global.dart';
 import 'package:guet_card/Providers/UsernameProvider.dart';
 import 'package:guet_card/Utils/CheckingUpdate.dart';
-import 'package:guet_card/Utils/LogUtil.dart';
-import 'package:guet_card/firebase_options.dart';
 import 'package:guet_card/pages/HomePage/HomePage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,20 +18,18 @@ void printPref() async {
   if (currentMode == "debug") {
     var pref = await SharedPreferences.getInstance();
     try {
+      debugPrint("User preferences:");
       String? userAvatar = pref.getString("userAvatar");
       String? name = pref.getString("name");
       bool? skipGuide = pref.getBool("isSkipGuide");
-      LogUtil.info(message: "userAvatar: $userAvatar\nname: $name\nisSkipGuide: $skipGuide");
-    } catch (error, stackTrace) {
-      LogUtil.error(message: '读取 SharedPref 出错', error: error, stackTrace: stackTrace);
+      debugPrint("userAvatar: $userAvatar\nname: $name\nisSkipGuide: $skipGuide");
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 }
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseAnalytics.instance.logAppOpen();
+void main() {
   runApp(MultiProvider(
     providers: [ChangeNotifierProvider(create: (context) => UsernameProvider(""))],
     child: HomePage(),
