@@ -89,9 +89,8 @@ class _AvatarState extends State<Avatar> {
   @override
   Widget build(BuildContext context) {
     List<Widget> sheetContent = [];
-    if (!kIsWeb) {
-      // 添加移动端特有的菜单
-      final ImagePicker _imgPicker = ImagePicker();
+    final ImagePicker _imgPicker = ImagePicker();
+    if (!kIsWeb)
       sheetContent.add(
         ListTile(
           leading: Icon(Icons.photo_camera),
@@ -127,6 +126,7 @@ class _AvatarState extends State<Avatar> {
           },
         ),
       );
+    if (!kIsWeb)
       sheetContent.add(
         ListTile(
           leading: Icon(Icons.photo_library),
@@ -163,8 +163,6 @@ class _AvatarState extends State<Avatar> {
           },
         ),
       );
-    }
-    // 添加双端通用的菜单
     sheetContent.add(
       ListTile(
         leading: Icon(Icons.image),
@@ -178,21 +176,25 @@ class _AvatarState extends State<Avatar> {
           Navigator.pop(context);
           String? url = await Navigator.of(context).pushNamed("changeAvatarPage") as String?;
           if (url != null) {
-            try {
-              ProgressHud.showLoading(text: "正在保存...");
-              Response value = await Dio().get<List<int>>(url, options: Options(responseType: ResponseType.bytes));
-              // 下载后转 base64 存储到 SharedPref（网页上实际是存到LocalStorage）
-              String b64String = 'base64:${base64Encode(value.data)}';
-              _saveUserAvatar(b64String);
-              setState(() {
-                _avatarPath = b64String;
-              });
-              ProgressHud.dismiss();
-            } on DioError catch (e) {
-              print(e);
-              ProgressHud.dismiss();
-              ProgressHud.showErrorAndDismiss(text: '保存头像失败');
-            }
+            setState(() {
+              _avatarPath = url;
+            });
+            _saveUserAvatar(url);
+            // try {
+            //   ProgressHud.showLoading(text: "正在保存...");
+            //   Response value = await Dio().get<List<int>>(url, options: Options(responseType: ResponseType.bytes));
+            //   // 下载后转 base64 存储到 SharedPref（网页上实际是存到LocalStorage）
+            //   String b64String = 'base64:${base64Encode(value.data)}';
+            //   _saveUserAvatar(b64String);
+            //   setState(() {
+            //     _avatarPath = b64String;
+            //   });
+            //   ProgressHud.dismiss();
+            // } on DioError catch (e) {
+            //   print(e);
+            //   ProgressHud.dismiss();
+            //   ProgressHud.showErrorAndDismiss(text: '保存头像失败');
+            // }
           }
         },
       ),
@@ -208,9 +210,7 @@ class _AvatarState extends State<Avatar> {
           Navigator.pop(context);
 
           List<String> apiUrls = [
-            'https://api.sunweihu.com/api/sjtx/api.php',
-            'http://juapi.org/api/sjtx.php',
-            'https://api.qicaiyun.top/sjtx/api.php',
+            'https://api.vvhan.com/api/avatar',
           ];
 
           ProgressHud.showLoading(text: "正在保存...");

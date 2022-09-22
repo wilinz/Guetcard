@@ -14,6 +14,12 @@ deploy_web() {
     firebase deploy
 }
 
+deploy_test() {
+    flutter build web --release
+    cp ./avatar_list.txt build/web/
+    firebase hosting:channel:deploy beta
+}
+
 build_apk() {
     flutter build apk --release --target-platform android-arm,android-x64 --split-per-abi
 }
@@ -91,6 +97,9 @@ if [ $# -gt 0 ]; then
             exit
         elif [ "$arg"x == "deploy"x ]; then
             deploy_web
+            exit
+        elif [ "$arg"x == "deploy_test"x ]; then
+            deploy_test
             exit
         elif [ "$arg"x == "archive"x ]; then
             iOS_archive
